@@ -22,11 +22,11 @@
     },
     {
       "model": "random_forest",
-      "accuracy": 0.8163,
-      "precision": 0.3478,
-      "recall": 0.1702,
-      "f1": 0.2286,
-      "roc_auc": 0.7551
+      "accuracy": 0.8197,
+      "precision": 0.4167,
+      "recall": 0.3191,
+      "f1": 0.3614,
+      "roc_auc": 0.7495
     },
     {
       "model": "decision_tree",
@@ -60,12 +60,12 @@
     ],
     "random_forest": [
       [
-        232,
-        15
+        226,
+        21
       ],
       [
-        39,
-        8
+        32,
+        15
       ]
     ],
     "xgboost": [
@@ -179,37 +179,37 @@
       "top_features": [
         {
           "feature": "job_stability_index",
-          "importance": 0.38483227235536366,
+          "importance": 0.3848322723553626,
           "rank": 1
         },
         {
           "feature": "OverTime_Yes",
-          "importance": 0.18684029984655198,
+          "importance": 0.18684029984654973,
           "rank": 2
         },
         {
           "feature": "Age",
-          "importance": 0.13377313768412866,
+          "importance": 0.13377313768412935,
           "rank": 3
         },
         {
           "feature": "income_vs_role_median",
-          "importance": 0.11676962921335297,
+          "importance": 0.11676962921335392,
           "rank": 4
         },
         {
           "feature": "avg_satisfaction_score",
-          "importance": 0.08745874241923181,
+          "importance": 0.0874587424192318,
           "rank": 5
         },
         {
           "feature": "burnout_risk_flag",
-          "importance": 0.058002581911212714,
+          "importance": 0.0580025819112127,
           "rank": 6
         },
         {
           "feature": "StockOptionLevel",
-          "importance": 0.03232333657015819,
+          "importance": 0.03232333657015985,
           "rank": 7
         },
         {
@@ -257,86 +257,86 @@
     {
       "name": "random_forest",
       "metrics": {
-        "accuracy": 0.8163265306122449,
-        "precision": 0.34782608695652173,
-        "recall": 0.1702127659574468,
-        "f1": 0.22857142857142856,
-        "roc_auc": 0.755103798776811
+        "accuracy": 0.8197278911564626,
+        "precision": 0.4166666666666667,
+        "recall": 0.3191489361702128,
+        "f1": 0.3614457831325301,
+        "roc_auc": 0.749504694633474
       },
       "top_features": [
         {
           "feature": "job_stability_index",
-          "importance": 0.08911444465180515,
+          "importance": 0.0668503393333018,
           "rank": 1
         },
         {
-          "feature": "Age",
-          "importance": 0.05959121825184711,
+          "feature": "MonthlyIncome",
+          "importance": 0.05340747591367685,
           "rank": 2
         },
         {
-          "feature": "MonthlyIncome",
-          "importance": 0.05165576747828446,
+          "feature": "Age",
+          "importance": 0.05090281374015137,
           "rank": 3
         },
         {
           "feature": "compensation_per_experience",
-          "importance": 0.04520292904609031,
+          "importance": 0.044963566227410316,
           "rank": 4
         },
         {
-          "feature": "manager_tenure_share",
-          "importance": 0.044373511263049344,
+          "feature": "income_vs_role_median",
+          "importance": 0.0410689117915477,
           "rank": 5
         },
         {
-          "feature": "OverTime_Yes",
-          "importance": 0.04141611723367968,
+          "feature": "TotalWorkingYears",
+          "importance": 0.03923277143070462,
           "rank": 6
         },
         {
           "feature": "avg_satisfaction_score",
-          "importance": 0.04079472690521824,
+          "importance": 0.038839984642349765,
           "rank": 7
         },
         {
-          "feature": "TotalWorkingYears",
-          "importance": 0.04062558108477795,
+          "feature": "OverTime_Yes",
+          "importance": 0.03857432620307502,
           "rank": 8
         },
         {
           "feature": "DailyRate",
-          "importance": 0.0403728309204412,
+          "importance": 0.03691653826001929,
           "rank": 9
         },
         {
-          "feature": "income_vs_role_median",
-          "importance": 0.038411474251245636,
+          "feature": "MonthlyRate",
+          "importance": 0.03490555581007399,
           "rank": 10
         },
         {
-          "feature": "MonthlyRate",
-          "importance": 0.03283771527167348,
+          "feature": "manager_tenure_share",
+          "importance": 0.03320747541506399,
           "rank": 11
         },
         {
-          "feature": "YearsAtCompany",
-          "importance": 0.032695740341868514,
+          "feature": "DistanceFromHome",
+          "importance": 0.0320837875384001,
           "rank": 12
         },
         {
-          "feature": "StockOptionLevel",
-          "importance": 0.031218024293945885,
+          "feature": "HourlyRate",
+          "importance": 0.031888631466658816,
           "rank": 13
         },
         {
-          "feature": "HourlyRate",
-          "importance": 0.029930516336615094,
+          "feature": "YearsWithCurrManager",
+          "importance": 0.029481625688705347,
           "rank": 14
         },
         {
-          "feature": "DistanceFromHome",
-          "importance": 0.028720046697837773,
+          "feature": "YearsAtCompany",
+          "importance": 0.028994366210188225,
           "rank": 15
         }
       ]

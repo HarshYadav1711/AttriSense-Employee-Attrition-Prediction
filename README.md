@@ -37,11 +37,13 @@ Run the full pipeline (preprocessing → features → training → evaluation):
 python scripts/run_pipeline.py
 ```
 
-Launch the dashboard:
+Launch the dashboard (uses the project `.venv` automatically):
 
 ```bash
-streamlit run app/main.py
+python scripts/run_app.py
 ```
+
+Windows shortcut: double-click `run.bat`.
 
 ## Documentation
 

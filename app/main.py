@@ -15,14 +15,42 @@ if str(ROOT) not in sys.path:
 
 import streamlit as st  # noqa: E402
 
-from app.pages import (  # noqa: E402
-    about,
-    dataset_explorer,
-    eda_dashboard,
-    home,
-    model_insights,
-    prediction,
-)
+
+def _home_page() -> None:
+    from app.views import home
+
+    home.render()
+
+
+def _dataset_explorer_page() -> None:
+    from app.views import dataset_explorer
+
+    dataset_explorer.render()
+
+
+def _eda_dashboard_page() -> None:
+    from app.views import eda_dashboard
+
+    eda_dashboard.render()
+
+
+def _prediction_page() -> None:
+    from app.views import prediction
+
+    prediction.render()
+
+
+def _model_insights_page() -> None:
+    from app.views import model_insights
+
+    model_insights.render()
+
+
+def _about_page() -> None:
+    from app.views import about
+
+    about.render()
+
 
 st.set_page_config(
     page_title="AttriSense · HR Analytics",
@@ -32,12 +60,12 @@ st.set_page_config(
 )
 
 pages = [
-    st.Page(home.render, title="Home", icon="🏠", default=True),
-    st.Page(dataset_explorer.render, title="Dataset Explorer", icon="📋"),
-    st.Page(eda_dashboard.render, title="EDA Dashboard", icon="📈"),
-    st.Page(prediction.render, title="Prediction", icon="🎯"),
-    st.Page(model_insights.render, title="Model Insights", icon="🔬"),
-    st.Page(about.render, title="About", icon="ℹ️"),
+    st.Page(_home_page, title="Home", icon="🏠", url_path="home", default=True),
+    st.Page(_dataset_explorer_page, title="Dataset Explorer", icon="📋", url_path="dataset-explorer"),
+    st.Page(_eda_dashboard_page, title="EDA Dashboard", icon="📈", url_path="eda-dashboard"),
+    st.Page(_prediction_page, title="Prediction", icon="🎯", url_path="prediction"),
+    st.Page(_model_insights_page, title="Model Insights", icon="🔬", url_path="model-insights"),
+    st.Page(_about_page, title="About", icon="ℹ️", url_path="about"),
 ]
 
 with st.sidebar:
@@ -46,4 +74,5 @@ with st.sidebar:
     st.divider()
 
 pg = st.navigation(pages, position="sidebar")
-pg.run()
+with st.spinner("Loading AttriSense..."):
+    pg.run()

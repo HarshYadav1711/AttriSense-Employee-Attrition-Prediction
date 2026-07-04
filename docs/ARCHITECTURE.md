@@ -77,7 +77,7 @@ Logistic Regression uses scaling; tree models do not. Class imbalance is handled
 | Directory | Role |
 |-----------|------|
 | `main.py` | Page routing via `st.navigation` |
-| `pages/` | One module per screen (Home, Explorer, EDA, Prediction, Insights, About) |
+| `views/` | One module per screen (Home, Explorer, EDA, Prediction, Insights, About) |
 | `services/` | `@st.cache_*` wrappers around package loaders and predictors |
 | `components/` | Shared layout helpers and Plotly charts |
 | `styles/theme.css` | Internal HR analytics visual theme |

@@ -255,6 +255,15 @@ def render() -> None:
         "Includes probability, confidence, and SHAP-based explanations.",
     )
 
+    try:
+        from attrisense.inference import check_sklearn_runtime
+
+        check_sklearn_runtime()
+    except RuntimeError as exc:
+        st.error(str(exc))
+        page_footer()
+        return
+
     options = get_categorical_options()
     tab_single, tab_batch = st.tabs(["Single Employee", "Batch Upload"])
 

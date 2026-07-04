@@ -6,7 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from attrisense.inference import ValidationIssue
+from attrisense.validation import ValidationIssue
 
 THEME_PATH = Path(__file__).resolve().parents[1] / "styles" / "theme.css"
 

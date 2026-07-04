@@ -17,6 +17,7 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
+import sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
@@ -308,6 +309,7 @@ def run_training_pipeline(
         "test_size": cfg.modeling.test_size,
         "cv_folds": cfg.modeling.cv_folds,
         "scoring": cfg.modeling.scoring,
+        "sklearn_version": sklearn.__version__,
         "n_train": len(x_train),
         "n_test": len(x_test),
         "feature_count": len(features),

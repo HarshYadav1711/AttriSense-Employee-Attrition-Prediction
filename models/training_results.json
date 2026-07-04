@@ -3,6 +3,7 @@
   "test_size": 0.2,
   "cv_folds": 5,
   "scoring": "roc_auc",
+  "sklearn_version": "1.9.0",
   "n_train": 1176,
   "n_test": 294,
   "feature_count": 37,
@@ -57,25 +58,25 @@
     {
       "name": "random_forest",
       "best_params": {
-        "classifier__max_depth": 10,
-        "classifier__max_features": "sqrt",
-        "classifier__min_samples_split": 10,
-        "classifier__n_estimators": 100
+        "classifier__max_depth": null,
+        "classifier__max_features": "log2",
+        "classifier__min_samples_split": 5,
+        "classifier__n_estimators": 300
       },
-      "cv_best_score": 0.8051002949613689,
+      "cv_best_score": 0.8088534287572493,
       "train_metrics": {
-        "accuracy": 0.9863945578231292,
-        "precision": 0.9578947368421052,
-        "recall": 0.9578947368421052,
-        "f1": 0.9578947368421052,
-        "roc_auc": 0.9984306608305754
+        "accuracy": 0.9948979591836735,
+        "precision": 0.9693877551020408,
+        "recall": 1.0,
+        "f1": 0.9844559585492227,
+        "roc_auc": 1.0
       },
       "test_metrics": {
-        "accuracy": 0.8163265306122449,
-        "precision": 0.34782608695652173,
-        "recall": 0.1702127659574468,
-        "f1": 0.22857142857142856,
-        "roc_auc": 0.755103798776811
+        "accuracy": 0.8197278911564626,
+        "precision": 0.4166666666666667,
+        "recall": 0.3191489361702128,
+        "f1": 0.3614457831325301,
+        "roc_auc": 0.749504694633474
       },
       "model_path": "models/random_forest.joblib"
     },

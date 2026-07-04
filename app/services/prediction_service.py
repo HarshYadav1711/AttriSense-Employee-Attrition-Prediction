@@ -57,15 +57,18 @@ def run_batch_prediction(upload_df: pd.DataFrame, threshold: float) -> pd.DataFr
     """Cached batch prediction for identical uploads."""
     result = predict_attrition(upload_df, threshold=threshold)
     output = build_prediction_dataframe(result)
-    if "EmployeeNumber" in upload_df.columns:
+    if "EmployeeNumber" in upload_df.columns and "EmployeeNumber" not in output.columns:
         output.insert(0, "EmployeeNumber", upload_df["EmployeeNumber"].values)
     return output
 
 
 def run_single_prediction(record: dict, threshold: float) -> tuple[PredictionResult, pd.DataFrame]:
     """Predict attrition for one employee record."""
-    df = pd.DataFrame([record])
-    df.insert(0, "EmployeeNumber", record.get("EmployeeNumber", 1))
+    employee_number = record.get("EmployeeNumber", 1)
+    input_columns = get_input_columns()
+    model_row = {column: record[column] for column in input_columns}
+    df = pd.DataFrame([model_row])
+    df.insert(0, "EmployeeNumber", employee_number)
     result = predict_attrition(df, threshold=threshold)
     return result, build_prediction_dataframe(result)
 

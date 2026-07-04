@@ -17,7 +17,7 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
-import shap
+import sklearn
 from sklearn.pipeline import Pipeline
 
 from attrisense.config import ProjectConfig, load_config
@@ -28,14 +28,35 @@ from attrisense.data.feature_engineering import (
 from attrisense.models.pipelines import get_transformed_feature_names
 from attrisense.models.training import load_selected_features
 from attrisense.utils.paths import DATA_PROCESSED_DIR, MODELS_DIR
+from attrisense.validation import ValidationIssue
 
 # Validation and risk-scoring defaults (also used by the Streamlit form).
 DEFAULT_DECISION_THRESHOLD = 0.5
 DEFAULT_SHAP_BACKGROUND_SIZE = 120
 MAX_BATCH_VALIDATION_ERRORS = 20
 DEFAULT_SHAP_TOP_N = 12
+REQUIRED_SKLEARN_VERSION = "1.9.0"
 AGE_MIN = 18
 AGE_MAX = 70
+
+
+def _parse_version(version: str) -> tuple[int, ...]:
+    parts: list[int] = []
+    for piece in version.split("."):
+        digits = "".join(ch for ch in piece if ch.isdigit())
+        parts.append(int(digits) if digits else 0)
+    while len(parts) < 3:
+        parts.append(0)
+    return tuple(parts[:3])
+
+
+def _sklearn_upgrade_message(required: str, current: str) -> str:
+    return (
+        f"Incompatible scikit-learn version: runtime has {current}, "
+        f"but saved models require >={required}. "
+        "From the project root run `run.bat` "
+        "or `.venv\\Scripts\\python.exe -m streamlit run app/main.py`."
+    )
 
 RISK_TIERS = (
     (0.60, "High"),
@@ -43,15 +64,6 @@ RISK_TIERS = (
     (0.25, "Moderate"),
     (0.0, "Low"),
 )
-
-
-@dataclass
-class ValidationIssue:
-    """Single validation error or warning."""
-
-    field: str
-    message: str
-    severity: str  # "error" | "warning"
 
 
 @dataclass
@@ -95,8 +107,26 @@ def get_input_columns(
     return [col for col in cfg.model_feature_columns if col not in dropped]
 
 
+def _saved_sklearn_version(models_dir: Path | None = None) -> str | None:
+    """Return the sklearn version recorded at training time, if available."""
+    path = (models_dir or MODELS_DIR) / "training_results.json"
+    if not path.exists():
+        return None
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return payload.get("sklearn_version")
+
+
+def check_sklearn_runtime(models_dir: Path | None = None) -> None:
+    """Ensure runtime sklearn is new enough for saved model artifacts."""
+    required = _saved_sklearn_version(models_dir) or REQUIRED_SKLEARN_VERSION
+    current = sklearn.__version__
+    if _parse_version(current) < _parse_version(required):
+        raise RuntimeError(_sklearn_upgrade_message(required, current))
+
+
 def load_best_model(models_dir: Path | None = None) -> Pipeline:
     """Load the persisted best-model pipeline."""
+    check_sklearn_runtime(models_dir)
     path = (models_dir or MODELS_DIR) / "best_model.joblib"
     if not path.exists():
         raise FileNotFoundError(
@@ -317,6 +347,8 @@ def compute_shap_explanation(
     background_size: int = DEFAULT_SHAP_BACKGROUND_SIZE,
 ) -> ShapExplanation:
     """Compute SHAP values for a single prediction using the linear model."""
+    import shap
+
     pipeline = load_best_model(models_dir)
     preprocessor = pipeline.named_steps["preprocessor"]
     classifier = pipeline.named_steps["classifier"]
