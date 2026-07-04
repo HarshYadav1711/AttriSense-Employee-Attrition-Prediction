@@ -95,3 +95,9 @@ feature_engineering:
   burnout_wlb_threshold: 2
   # |Pearson r| above this triggers redundancy review (not automatic removal)
   correlation_threshold: 0.92
+
+modeling:
+  test_size: 0.2
+  cv_folds: 5
+  scoring: roc_auc
+  n_jobs: -1

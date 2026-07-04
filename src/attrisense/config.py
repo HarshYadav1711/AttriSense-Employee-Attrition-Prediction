@@ -39,6 +39,16 @@ class FeatureEngineeringConfig:
 
 
 @dataclass(frozen=True)
+class ModelingConfig:
+    """Model training parameters."""
+
+    test_size: float
+    cv_folds: int
+    scoring: str
+    n_jobs: int
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     """Typed view of ``configs/config.yaml``."""
 
@@ -55,6 +65,7 @@ class ProjectConfig:
     features: FeatureConfig
     preprocessing: PreprocessingConfig
     feature_engineering: FeatureEngineeringConfig
+    modeling: ModelingConfig
 
     @property
     def model_feature_columns(self) -> list[str]:
@@ -70,6 +81,7 @@ class ProjectConfig:
         feat = data["features"]
         prep = data.get("preprocessing", {})
         fe = data.get("feature_engineering", {})
+        mod = data.get("modeling", {})
         return cls(
             random_state=data["random_state"],
             raw_filename=data["data"]["raw_filename"],
@@ -105,6 +117,12 @@ class ProjectConfig:
                 ),
                 burnout_wlb_threshold=int(fe.get("burnout_wlb_threshold", 2)),
                 correlation_threshold=float(fe.get("correlation_threshold", 0.92)),
+            ),
+            modeling=ModelingConfig(
+                test_size=float(mod.get("test_size", 0.2)),
+                cv_folds=int(mod.get("cv_folds", 5)),
+                scoring=str(mod.get("scoring", "roc_auc")),
+                n_jobs=int(mod.get("n_jobs", -1)),
             ),
         )
 

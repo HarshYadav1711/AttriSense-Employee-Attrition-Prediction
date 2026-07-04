@@ -1,0 +1,109 @@
+{
+  "random_state": 42,
+  "test_size": 0.2,
+  "cv_folds": 5,
+  "scoring": "roc_auc",
+  "n_train": 1176,
+  "n_test": 294,
+  "feature_count": 37,
+  "models": [
+    {
+      "name": "logistic_regression",
+      "best_params": {
+        "classifier__C": 10.0,
+        "classifier__solver": "saga"
+      },
+      "cv_best_score": 0.8354278828898118,
+      "train_metrics": {
+        "accuracy": 0.8001700680272109,
+        "precision": 0.4358974358974359,
+        "recall": 0.8052631578947368,
+        "f1": 0.5656192236598891,
+        "roc_auc": 0.8874132593146151
+      },
+      "test_metrics": {
+        "accuracy": 0.7755102040816326,
+        "precision": 0.38823529411764707,
+        "recall": 0.7021276595744681,
+        "f1": 0.5,
+        "roc_auc": 0.8164355241622878
+      },
+      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\logistic_regression.joblib"
+    },
+    {
+      "name": "decision_tree",
+      "best_params": {
+        "classifier__max_depth": 3,
+        "classifier__min_samples_leaf": 1,
+        "classifier__min_samples_split": 2
+      },
+      "cv_best_score": 0.7294418942294978,
+      "train_metrics": {
+        "accuracy": 0.8154761904761905,
+        "precision": 0.449438202247191,
+        "recall": 0.631578947368421,
+        "f1": 0.5251641137855579,
+        "roc_auc": 0.8076758834205188
+      },
+      "test_metrics": {
+        "accuracy": 0.7517006802721088,
+        "precision": 0.296875,
+        "recall": 0.40425531914893614,
+        "f1": 0.34234234234234234,
+        "roc_auc": 0.6550951847704367
+      },
+      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\decision_tree.joblib"
+    },
+    {
+      "name": "random_forest",
+      "best_params": {
+        "classifier__max_depth": null,
+        "classifier__max_features": "log2",
+        "classifier__min_samples_split": 5,
+        "classifier__n_estimators": 300
+      },
+      "cv_best_score": 0.8088534287572493,
+      "train_metrics": {
+        "accuracy": 0.9948979591836735,
+        "precision": 0.9693877551020408,
+        "recall": 1.0,
+        "f1": 0.9844559585492227,
+        "roc_auc": 1.0
+      },
+      "test_metrics": {
+        "accuracy": 0.8197278911564626,
+        "precision": 0.4166666666666667,
+        "recall": 0.3191489361702128,
+        "f1": 0.3614457831325301,
+        "roc_auc": 0.749504694633474
+      },
+      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\random_forest.joblib"
+    },
+    {
+      "name": "xgboost",
+      "best_params": {
+        "classifier__colsample_bytree": 1.0,
+        "classifier__learning_rate": 0.1,
+        "classifier__max_depth": 7,
+        "classifier__n_estimators": 200,
+        "classifier__subsample": 0.8
+      },
+      "cv_best_score": 0.818456674681628,
+      "train_metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+      },
+      "test_metrics": {
+        "accuracy": 0.826530612244898,
+        "precision": 0.43333333333333335,
+        "recall": 0.2765957446808511,
+        "f1": 0.33766233766233766,
+        "roc_auc": 0.7656990266172796
+      },
+      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\xgboost.joblib"
+    }
+  ]
+}
