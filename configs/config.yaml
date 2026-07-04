@@ -6,17 +6,79 @@ random_state: 42
 data:
   raw_filename: WA_Fn-UseC_-HR-Employee-Attrition.csv
   processed_filename: employee_attrition_cleaned.parquet
+  preprocessed_filename: employee_attrition_preprocessed.parquet
 
 target:
   column: Attrition
   positive_class: "Yes"
   negative_class: "No"
 
-# Columns with no predictive value (constant across all rows)
-drop_columns:
-  - EmployeeCount
-  - Over18
-  - StandardHours
-
-# Identifier — excluded from modeling features
+# Identifier — kept in cleaned data, excluded from model feature matrix
 id_column: EmployeeNumber
+
+# Constant columns — zero variance, no predictive signal (verified in data understanding)
+drop_columns:
+  - EmployeeCount   # always 1
+  - Over18          # always "Y"
+  - StandardHours   # always 80
+
+# Feature typing drives encoding and scaling decisions
+features:
+  ordinal:
+    - Education                  # 1 (Below College) – 5 (Doctor)
+    - EnvironmentSatisfaction    # 1 – 4 Likert scale
+    - JobInvolvement             # 1 – 4
+    - JobLevel                   # 1 – 5
+    - JobSatisfaction            # 1 – 4
+    - PerformanceRating          # 3 or 4 only in this dataset
+    - RelationshipSatisfaction   # 1 – 4
+    - StockOptionLevel           # 0 – 3
+    - WorkLifeBalance            # 1 – 4
+
+  nominal:
+    - BusinessTravel
+    - Department
+    - EducationField
+    - Gender
+    - JobRole
+    - MaritalStatus
+    - OverTime
+
+  continuous:
+    - Age
+    - DailyRate
+    - DistanceFromHome
+    - HourlyRate
+    - MonthlyIncome
+    - MonthlyRate
+    - NumCompaniesWorked
+    - PercentSalaryHike
+    - TotalWorkingYears
+    - TrainingTimesLastYear
+    - YearsAtCompany
+    - YearsInCurrentRole
+    - YearsSinceLastPromotion
+    - YearsWithCurrManager
+
+  # StandardScaler applied only when apply_scaling=True (linear models).
+  # Tree-based models (XGBoost) do not require scaling.
+  scale_when_required:
+    - Age
+    - DailyRate
+    - DistanceFromHome
+    - HourlyRate
+    - MonthlyIncome
+    - MonthlyRate
+    - NumCompaniesWorked
+    - PercentSalaryHike
+    - TotalWorkingYears
+    - TrainingTimesLastYear
+    - YearsAtCompany
+    - YearsInCurrentRole
+    - YearsSinceLastPromotion
+    - YearsWithCurrManager
+
+preprocessing:
+  outlier_iqr_multiplier: 1.5
+  # No capping or row removal by default — outlier report is diagnostic only.
+  cap_outliers: false
