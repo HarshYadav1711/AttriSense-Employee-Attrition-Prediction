@@ -1,4 +1,8 @@
-"""Cached data access for the Streamlit application."""
+"""Cached data and model loaders for the Streamlit application.
+
+Wraps ``attrisense`` package functions with ``@st.cache_data`` / ``@st.cache_resource``
+to avoid reloading CSV, parquet, and joblib artifacts on every page interaction.
+"""
 
 from __future__ import annotations
 

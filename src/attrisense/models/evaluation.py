@@ -1,4 +1,10 @@
-"""Model evaluation: metrics, confusion matrices, ROC curves, feature importance."""
+"""Model evaluation: metrics, confusion matrices, ROC curves, feature importance.
+
+Evaluates persisted models on the same stratified hold-out split used during
+training, generates comparison plots under ``reports/figures/``, selects the
+best model by test ROC-AUC (with F1/recall/generalization tie-breakers), and
+copies the winner to ``models/best_model.joblib``.
+"""
 
 from __future__ import annotations
 

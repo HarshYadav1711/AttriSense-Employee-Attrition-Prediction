@@ -1,4 +1,4 @@
-"""Data loading utilities."""
+"""Data loading utilities for the raw IBM HR Analytics dataset."""
 
 from __future__ import annotations
 

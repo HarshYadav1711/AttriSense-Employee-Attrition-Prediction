@@ -1,4 +1,11 @@
-"""Inference helpers for attrition prediction and SHAP explanations."""
+"""Inference helpers for attrition prediction and SHAP explanations.
+
+Provides the runtime path from raw employee input (29 base columns) through
+feature engineering to model scoring. Used by the Streamlit app and available
+for programmatic batch scoring:
+
+    from attrisense.inference import predict_attrition, build_prediction_dataframe
+"""
 
 from __future__ import annotations
 

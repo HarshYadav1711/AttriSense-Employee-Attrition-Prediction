@@ -1,55 +1,22 @@
 # AttriSense
 
-**Employee Attrition Prediction & Analytics System**
+Workforce attrition analytics and prediction for HR teams. AttriSense turns employee profile data into ranked retention risk, explanatory insights, and an interactive dashboard — all running locally on your machine.
 
-AttriSense is a machine learning system that predicts employee attrition and surfaces HR analytics from workforce data. It is built as a modular Python project with reproducible notebooks, a shared source package, and a Streamlit deployment layer.
+Built on the [IBM HR Analytics Attrition dataset](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset) (1,470 employees, ~16% attrition rate).
 
-The target use case: HR teams need early warning on employees likely to leave, plus context on which factors drive turnover — not just a probability score.
+## What it does
 
----
+- **Explores** workforce data with filters, summaries, and EDA charts
+- **Trains** four classifiers (Logistic Regression, Decision Tree, Random Forest, XGBoost) with stratified cross-validation
+- **Evaluates** models on hold-out metrics, confusion matrices, ROC curves, and feature importance
+- **Predicts** attrition probability for individual employees or CSV batches, with SHAP explanations
+- **Deploys** as a multi-page Streamlit app suitable for internal HR analytics
 
-## Problem
+The production model (Logistic Regression) achieves test ROC-AUC ~0.82. It is intended for **risk ranking and triage**, not deterministic individual predictions.
 
-Employee attrition is expensive. Replacing someone typically costs 50–200% of their annual salary once recruiting, onboarding, and lost productivity are accounted for. Most HR teams react after resignations arrive; a predictive layer helps prioritize retention conversations before exit interviews.
+## Quick start
 
-This project frames attrition as a **binary classification** problem: given an employee's profile and work history, estimate the probability they will leave within the observation window.
-
----
-
-## Dataset
-
-IBM HR Analytics Employee Attrition dataset (1,470 records, 35 features). Source: [Kaggle — IBM HR Analytics Employee Attrition](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset).
-
-Target variable: `Attrition` (`Yes` / `No`). Class distribution is imbalanced (~16% attrition).
-
----
-
-## Project Structure
-
-```
-AttriSense-Employee-Attrition-Prediction/
-├── configs/           # YAML configuration
-├── data/
-│   ├── raw/           # Original dataset (not committed: download separately)
-│   └── processed/     # Cleaned, feature-ready data
-├── notebooks/         # Analysis pipeline (MNNIT lifecycle order)
-├── src/attrisense/    # Reusable Python package
-├── models/            # Trained model artifacts
-├── reports/figures/   # EDA and evaluation plots
-├── app/               # Streamlit multi-page application
-│   ├── main.py        # Entry point (`streamlit run app/main.py`)
-│   ├── components/    # Shared UI and charts
-│   ├── pages/         # Home, Explorer, EDA, Prediction, Insights, About
-│   ├── services/      # Cached data and prediction helpers
-│   └── styles/        # Custom HR analytics theme
-└── tests/
-```
-
----
-
-## Setup
-
-Requires Python 3.11+.
+**Requirements:** Python 3.11+, raw CSV placed at `data/raw/WA_Fn-UseC_-HR-Employee-Attrition.csv`
 
 ```bash
 python -m venv .venv
@@ -62,58 +29,46 @@ source .venv/bin/activate
 
 pip install -r requirements.txt
 pip install -e .
-python -m ipykernel install --user --name=attrisense --display-name="AttriSense (.venv)"
 ```
 
-Select the **AttriSense (.venv)** kernel when running notebooks.
+Run the full pipeline (preprocessing → features → training → evaluation):
 
-Place the raw CSV at `data/raw/WA_Fn-UseC_-HR-Employee-Attrition.csv`.
+```bash
+python scripts/run_pipeline.py
+```
 
----
-
-## Notebooks (MNNIT Lifecycle)
-
-| # | Notebook | Phase |
-|---|----------|-------|
-| 01 | `01_problem_understanding.ipynb` | Problem Understanding |
-| 02 | `02_dataset_understanding.ipynb` | Dataset Understanding |
-| 03 | `03_data_cleaning.ipynb` | Data Cleaning |
-| 04 | `04_eda.ipynb` | EDA |
-| 05 | `05_feature_engineering.ipynb` | Feature Engineering |
-| 06 | `06_model_building.ipynb` | Model Building |
-| 07 | `07_model_evaluation.ipynb` | Model Evaluation |
-
-Notebooks are meant to be read in order. Each explains *why* a step is taken, not just *what* code runs.
-
----
-
-## Running the App
-
-Requires trained model artifacts (`models/best_model.joblib`) from the training/evaluation pipeline.
+Launch the dashboard:
 
 ```bash
 streamlit run app/main.py
 ```
 
-**Pages:** Home · Dataset Explorer · EDA Dashboard · Prediction · Model Insights · About
+## Documentation
 
-The app runs entirely locally — no authentication, cloud services, or external API calls.
+| Document | Contents |
+|----------|----------|
+| [docs/WORKFLOW.md](docs/WORKFLOW.md) | End-to-end pipeline, notebooks, artifacts, reproducibility |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, module layout, data flow |
 
----
+Configuration lives in `configs/config.yaml` (paths, feature types, model hyperparameters, random seed).
 
-## Reproducibility
+## Project layout
 
-- Random seed: `42` (set in `configs/config.yaml`)
-- Processed data and model artifacts are generated by notebooks/scripts, not hand-edited
-- No external API calls — everything runs locally
+```
+configs/          YAML configuration
+data/raw/         Source CSV (not committed)
+data/processed/   Generated parquet files
+src/attrisense/   Core Python package
+notebooks/        Interactive analysis pipeline
+models/           Trained pipelines and evaluation JSON
+reports/figures/  EDA and evaluation plots
+app/              Streamlit application
+scripts/          Pipeline automation
+```
 
----
+## Tech stack
 
-## Tech Stack
-
-Python · Pandas · NumPy · Matplotlib · Plotly · Scikit-learn · XGBoost · SHAP · Joblib · Streamlit
-
----
+Python · Pandas · Scikit-learn · XGBoost · SHAP · Plotly · Streamlit · Joblib
 
 ## License
 

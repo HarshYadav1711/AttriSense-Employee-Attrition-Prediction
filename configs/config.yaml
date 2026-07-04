@@ -1,6 +1,6 @@
 # AttriSense project configuration
-# All paths are relative to the repository root unless noted.
-
+# Single source of truth — edit here, then rerun the pipeline from the affected stage.
+# See docs/WORKFLOW.md for stage dependencies.
 random_state: 42
 
 data:

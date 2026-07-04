@@ -1,4 +1,10 @@
-"""Configuration loading."""
+"""Project configuration loading from YAML.
+
+``configs/config.yaml`` is the single source of truth for paths, feature
+typing, preprocessing rules, feature-engineering parameters, and modeling
+defaults. All pipeline stages accept an optional ``ProjectConfig``; when
+omitted, ``load_config()`` reads from the repository root automatically.
+"""
 
 from __future__ import annotations
 

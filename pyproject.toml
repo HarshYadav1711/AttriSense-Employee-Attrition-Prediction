@@ -8,10 +8,13 @@ version = "0.1.0"
 description = "Employee attrition prediction and HR analytics"
 readme = "README.md"
 requires-python = ">=3.11"
+license = { text = "MIT" }
 dependencies = [
     "pandas>=3.0",
     "numpy>=2.0",
+    "pyarrow>=24.0",
     "matplotlib>=3.8",
+    "seaborn>=0.13",
     "plotly>=6.0",
     "scikit-learn>=1.5",
     "xgboost>=3.0",
@@ -23,6 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["jupyter>=1.0", "ipykernel>=6.0", "pytest>=8.0"]
+notebooks = ["jupyter>=1.0", "ipykernel>=6.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

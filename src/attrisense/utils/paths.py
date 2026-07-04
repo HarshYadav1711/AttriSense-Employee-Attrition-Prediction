@@ -1,4 +1,9 @@
-"""Project path resolution."""
+"""Project path resolution.
+
+Locates the repository root by walking up from the current file until
+``configs/config.yaml`` is found, then exposes standard directory constants
+used across the package and Streamlit app.
+"""
 
 from pathlib import Path
 

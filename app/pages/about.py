@@ -3,7 +3,6 @@
 import streamlit as st
 
 from app.components.layout import load_theme, page_footer, page_header, section_title
-from attrisense.utils.paths import PROJECT_ROOT
 
 
 def render() -> None:
@@ -28,13 +27,11 @@ def render() -> None:
         | Layer | Location |
         |-------|----------|
         | Configuration | `configs/config.yaml` |
-        | Data pipeline | `src/attrisense/data/` |
-        | Model training | `src/attrisense/models/` |
-        | Inference & SHAP | `src/attrisense/inference.py` |
+        | Core package | `src/attrisense/` |
         | Streamlit app | `app/` |
-        | Model artifacts | `models/best_model.joblib` |
+        | Artifacts | `models/best_model.joblib` |
 
-        **Project root:** `{PROJECT_ROOT}`
+        See `docs/ARCHITECTURE.md` for the full system design.
         """
     )
 
@@ -46,6 +43,17 @@ def render() -> None:
         - **Test ROC-AUC:** ~0.82 (moderate discriminative ability)
         - **Test precision:** ~39% on attrition class
         - **Intended use:** Risk ranking and triage, not individual certainty
+        """
+    )
+
+    section_title("Documentation")
+    st.markdown(
+        """
+        Detailed guides live in the repository:
+
+        - `docs/WORKFLOW.md` — pipeline, notebooks, reproducibility
+        - `docs/ARCHITECTURE.md` — modules, data flow, artifacts
+        - `README.md` — quick start
         """
     )
 

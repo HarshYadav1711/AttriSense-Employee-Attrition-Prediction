@@ -1,4 +1,11 @@
-"""Model training with stratified split, CV tuning, and persistence."""
+"""Model training with stratified split, CV tuning, and persistence.
+
+Trains four classifiers (Logistic Regression, Decision Tree, Random Forest,
+XGBoost) using ``GridSearchCV`` with stratified k-fold cross-validation.
+The CV scoring metric defaults to ROC-AUC (see ``configs/config.yaml``).
+Each tuned pipeline is saved to ``models/{name}.joblib`` and summarized in
+``models/training_results.json``.
+"""
 
 from __future__ import annotations
 
@@ -261,7 +268,13 @@ def run_training_pipeline(
     models_dir: Path | None = None,
     model_names: list[str] | None = None,
 ) -> TrainingReport:
-    """Train all configured models and save comparison results."""
+    """Train all configured models and write comparison results to disk.
+
+    Loads feature-engineered parquet and ``selected_features.json``, performs
+    a stratified train/test split, tunes each model, evaluates on both splits,
+    and returns a ``TrainingReport`` with a comparison DataFrame sorted by
+    test ROC-AUC.
+    """
     cfg = config or load_config()
     mdir = models_dir or MODELS_DIR
 
