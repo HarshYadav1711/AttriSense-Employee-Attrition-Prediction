@@ -7,6 +7,7 @@ data:
   raw_filename: WA_Fn-UseC_-HR-Employee-Attrition.csv
   processed_filename: employee_attrition_cleaned.parquet
   preprocessed_filename: employee_attrition_preprocessed.parquet
+  feature_engineered_filename: employee_attrition_featured.parquet
 
 target:
   column: Attrition
@@ -82,3 +83,15 @@ preprocessing:
   outlier_iqr_multiplier: 1.5
   # No capping or row removal by default — outlier report is diagnostic only.
   cap_outliers: false
+
+feature_engineering:
+  # Satisfaction columns used for the composite engagement score
+  satisfaction_columns:
+    - JobSatisfaction
+    - EnvironmentSatisfaction
+    - RelationshipSatisfaction
+    - WorkLifeBalance
+  # WorkLifeBalance <= threshold combined with OverTime = Yes → burnout_risk_flag
+  burnout_wlb_threshold: 2
+  # |Pearson r| above this triggers redundancy review (not automatic removal)
+  correlation_threshold: 0.92

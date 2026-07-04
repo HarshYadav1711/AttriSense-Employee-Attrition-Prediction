@@ -30,6 +30,15 @@ class PreprocessingConfig:
 
 
 @dataclass(frozen=True)
+class FeatureEngineeringConfig:
+    """Feature engineering parameters."""
+
+    satisfaction_columns: list[str]
+    burnout_wlb_threshold: int
+    correlation_threshold: float
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     """Typed view of ``configs/config.yaml``."""
 
@@ -37,6 +46,7 @@ class ProjectConfig:
     raw_filename: str
     processed_filename: str
     preprocessed_filename: str
+    feature_engineered_filename: str
     target_column: str
     positive_class: str
     negative_class: str
@@ -44,6 +54,7 @@ class ProjectConfig:
     id_column: str
     features: FeatureConfig
     preprocessing: PreprocessingConfig
+    feature_engineering: FeatureEngineeringConfig
 
     @property
     def model_feature_columns(self) -> list[str]:
@@ -58,11 +69,13 @@ class ProjectConfig:
     def from_dict(cls, data: dict[str, Any]) -> ProjectConfig:
         feat = data["features"]
         prep = data.get("preprocessing", {})
+        fe = data.get("feature_engineering", {})
         return cls(
             random_state=data["random_state"],
             raw_filename=data["data"]["raw_filename"],
             processed_filename=data["data"]["processed_filename"],
             preprocessed_filename=data["data"]["preprocessed_filename"],
+            feature_engineered_filename=data["data"]["feature_engineered_filename"],
             target_column=data["target"]["column"],
             positive_class=data["target"]["positive_class"],
             negative_class=data["target"]["negative_class"],
@@ -77,6 +90,21 @@ class ProjectConfig:
             preprocessing=PreprocessingConfig(
                 outlier_iqr_multiplier=float(prep.get("outlier_iqr_multiplier", 1.5)),
                 cap_outliers=bool(prep.get("cap_outliers", False)),
+            ),
+            feature_engineering=FeatureEngineeringConfig(
+                satisfaction_columns=list(
+                    fe.get(
+                        "satisfaction_columns",
+                        [
+                            "JobSatisfaction",
+                            "EnvironmentSatisfaction",
+                            "RelationshipSatisfaction",
+                            "WorkLifeBalance",
+                        ],
+                    )
+                ),
+                burnout_wlb_threshold=int(fe.get("burnout_wlb_threshold", 2)),
+                correlation_threshold=float(fe.get("correlation_threshold", 0.92)),
             ),
         )
 

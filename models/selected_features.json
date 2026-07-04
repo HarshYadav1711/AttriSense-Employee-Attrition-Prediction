@@ -1,0 +1,53 @@
+{
+  "selected_features": [
+    "Education",
+    "EnvironmentSatisfaction",
+    "JobInvolvement",
+    "JobSatisfaction",
+    "PerformanceRating",
+    "RelationshipSatisfaction",
+    "StockOptionLevel",
+    "WorkLifeBalance",
+    "BusinessTravel",
+    "Department",
+    "EducationField",
+    "Gender",
+    "JobRole",
+    "MaritalStatus",
+    "OverTime",
+    "Age",
+    "DailyRate",
+    "DistanceFromHome",
+    "HourlyRate",
+    "MonthlyIncome",
+    "MonthlyRate",
+    "NumCompaniesWorked",
+    "PercentSalaryHike",
+    "TotalWorkingYears",
+    "TrainingTimesLastYear",
+    "YearsAtCompany",
+    "YearsInCurrentRole",
+    "YearsSinceLastPromotion",
+    "YearsWithCurrManager",
+    "promotion_stagnation_ratio",
+    "role_tenure_share",
+    "manager_tenure_share",
+    "income_vs_role_median",
+    "compensation_per_experience",
+    "avg_satisfaction_score",
+    "burnout_risk_flag",
+    "job_stability_index"
+  ],
+  "dropped_features": [
+    "JobLevel"
+  ],
+  "drop_justifications": [
+    {
+      "dropped": "JobLevel",
+      "kept": "MonthlyIncome",
+      "correlation": 0.9503,
+      "reason": "|r|=0.950 with 'MonthlyIncome' (importance 0.0540 vs 0.0206)"
+    }
+  ],
+  "random_state": 42
+}

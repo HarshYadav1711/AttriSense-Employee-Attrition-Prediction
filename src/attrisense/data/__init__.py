@@ -9,6 +9,19 @@ from attrisense.data.cleaning import (
     validate_target_values,
 )
 from attrisense.data.features import FEATURE_REGISTRY, feature_registry_dataframe
+from attrisense.data.feature_engineering import (
+    ENGINEERED_FEATURE_SPECS,
+    FeatureEngineeringReport,
+    FeatureEngineeringState,
+    apply_engineered_features,
+    engineered_feature_catalog,
+    evaluate_feature_importance,
+    find_redundant_pairs,
+    fit_feature_engineering_state,
+    load_feature_engineered_data,
+    resolve_redundancy,
+    run_feature_engineering_pipeline,
+)
 from attrisense.data.loader import dataset_summary, load_raw_data
 from attrisense.data.preprocessing import (
     PreprocessingReport,
@@ -26,7 +39,18 @@ from attrisense.data.preprocessing import (
 )
 
 __all__ = [
+    "ENGINEERED_FEATURE_SPECS",
     "FEATURE_REGISTRY",
+    "FeatureEngineeringReport",
+    "FeatureEngineeringState",
+    "apply_engineered_features",
+    "engineered_feature_catalog",
+    "evaluate_feature_importance",
+    "find_redundant_pairs",
+    "fit_feature_engineering_state",
+    "load_feature_engineered_data",
+    "resolve_redundancy",
+    "run_feature_engineering_pipeline",
     "PreprocessingReport",
     "build_feature_transformer",
     "clean_raw_data",
