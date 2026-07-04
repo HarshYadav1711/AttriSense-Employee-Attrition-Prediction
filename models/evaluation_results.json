@@ -1,0 +1,432 @@
+{
+  "best_model": "logistic_regression",
+  "selection_rationale": "Selected **Logistic Regression** based on the hold-out test set. It achieves the highest ROC-AUC (0.816), the best F1 (0.500), and the highest recall (0.702) among the four candidates. Its train\u2013test ROC-AUC gap (0.071) is smaller than tree-based models that show near-perfect training scores. Performance remains moderate overall (ROC-AUC \u2248 0.82, precision \u2248 0.39); the model is useful for ranking attrition risk, not for high-confidence individual predictions.",
+  "n_test": 294,
+  "positive_rate": 0.1598639455782313,
+  "metrics_comparison": [
+    {
+      "model": "logistic_regression",
+      "accuracy": 0.7755,
+      "precision": 0.3882,
+      "recall": 0.7021,
+      "f1": 0.5,
+      "roc_auc": 0.8164
+    },
+    {
+      "model": "xgboost",
+      "accuracy": 0.8265,
+      "precision": 0.4333,
+      "recall": 0.2766,
+      "f1": 0.3377,
+      "roc_auc": 0.7657
+    },
+    {
+      "model": "random_forest",
+      "accuracy": 0.8163,
+      "precision": 0.3478,
+      "recall": 0.1702,
+      "f1": 0.2286,
+      "roc_auc": 0.7551
+    },
+    {
+      "model": "decision_tree",
+      "accuracy": 0.7517,
+      "precision": 0.2969,
+      "recall": 0.4043,
+      "f1": 0.3423,
+      "roc_auc": 0.6551
+    }
+  ],
+  "confusion_matrices": {
+    "logistic_regression": [
+      [
+        195,
+        52
+      ],
+      [
+        14,
+        33
+      ]
+    ],
+    "decision_tree": [
+      [
+        202,
+        45
+      ],
+      [
+        28,
+        19
+      ]
+    ],
+    "random_forest": [
+      [
+        232,
+        15
+      ],
+      [
+        39,
+        8
+      ]
+    ],
+    "xgboost": [
+      [
+        230,
+        17
+      ],
+      [
+        34,
+        13
+      ]
+    ]
+  },
+  "models": [
+    {
+      "name": "logistic_regression",
+      "metrics": {
+        "accuracy": 0.7755102040816326,
+        "precision": 0.38823529411764707,
+        "recall": 0.7021276595744681,
+        "f1": 0.5,
+        "roc_auc": 0.8164355241622878
+      },
+      "top_features": [
+        {
+          "feature": "JobRole_Research Director",
+          "abs_coefficient": 4.589016221915872,
+          "rank": 1
+        },
+        {
+          "feature": "JobRole_Sales Representative",
+          "abs_coefficient": 4.022973971854692,
+          "rank": 2
+        },
+        {
+          "feature": "JobRole_Laboratory Technician",
+          "abs_coefficient": 3.198255883034078,
+          "rank": 3
+        },
+        {
+          "feature": "JobRole_Human Resources",
+          "abs_coefficient": 3.1970581915344414,
+          "rank": 4
+        },
+        {
+          "feature": "JobRole_Manager",
+          "abs_coefficient": 3.0252117531342932,
+          "rank": 5
+        },
+        {
+          "feature": "BusinessTravel_Travel_Frequently",
+          "abs_coefficient": 1.9364099814260562,
+          "rank": 6
+        },
+        {
+          "feature": "JobRole_Research Scientist",
+          "abs_coefficient": 1.9282234274654044,
+          "rank": 7
+        },
+        {
+          "feature": "MonthlyIncome",
+          "abs_coefficient": 1.7419412762396391,
+          "rank": 8
+        },
+        {
+          "feature": "OverTime_Yes",
+          "abs_coefficient": 1.6385630188384406,
+          "rank": 9
+        },
+        {
+          "feature": "JobRole_Sales Executive",
+          "abs_coefficient": 1.4464757750049764,
+          "rank": 10
+        },
+        {
+          "feature": "EducationField_Other",
+          "abs_coefficient": 1.4329079526726525,
+          "rank": 11
+        },
+        {
+          "feature": "BusinessTravel_Travel_Rarely",
+          "abs_coefficient": 1.1257516756083112,
+          "rank": 12
+        },
+        {
+          "feature": "EducationField_Life Sciences",
+          "abs_coefficient": 1.0958387407878414,
+          "rank": 13
+        },
+        {
+          "feature": "MaritalStatus_Single",
+          "abs_coefficient": 1.014247980591679,
+          "rank": 14
+        },
+        {
+          "feature": "EducationField_Medical",
+          "abs_coefficient": 0.9265798163195504,
+          "rank": 15
+        }
+      ]
+    },
+    {
+      "name": "decision_tree",
+      "metrics": {
+        "accuracy": 0.7517006802721088,
+        "precision": 0.296875,
+        "recall": 0.40425531914893614,
+        "f1": 0.34234234234234234,
+        "roc_auc": 0.6550951847704367
+      },
+      "top_features": [
+        {
+          "feature": "job_stability_index",
+          "importance": 0.38483227235536366,
+          "rank": 1
+        },
+        {
+          "feature": "OverTime_Yes",
+          "importance": 0.18684029984655198,
+          "rank": 2
+        },
+        {
+          "feature": "Age",
+          "importance": 0.13377313768412866,
+          "rank": 3
+        },
+        {
+          "feature": "income_vs_role_median",
+          "importance": 0.11676962921335297,
+          "rank": 4
+        },
+        {
+          "feature": "avg_satisfaction_score",
+          "importance": 0.08745874241923181,
+          "rank": 5
+        },
+        {
+          "feature": "burnout_risk_flag",
+          "importance": 0.058002581911212714,
+          "rank": 6
+        },
+        {
+          "feature": "StockOptionLevel",
+          "importance": 0.03232333657015819,
+          "rank": 7
+        },
+        {
+          "feature": "Department_Sales",
+          "importance": 0.0,
+          "rank": 8
+        },
+        {
+          "feature": "EducationField_Technical Degree",
+          "importance": 0.0,
+          "rank": 9
+        },
+        {
+          "feature": "Gender_Male",
+          "importance": 0.0,
+          "rank": 10
+        },
+        {
+          "feature": "JobRole_Human Resources",
+          "importance": 0.0,
+          "rank": 11
+        },
+        {
+          "feature": "JobRole_Laboratory Technician",
+          "importance": 0.0,
+          "rank": 12
+        },
+        {
+          "feature": "EducationField_Life Sciences",
+          "importance": 0.0,
+          "rank": 13
+        },
+        {
+          "feature": "EducationField_Marketing",
+          "importance": 0.0,
+          "rank": 14
+        },
+        {
+          "feature": "EducationField_Medical",
+          "importance": 0.0,
+          "rank": 15
+        }
+      ]
+    },
+    {
+      "name": "random_forest",
+      "metrics": {
+        "accuracy": 0.8163265306122449,
+        "precision": 0.34782608695652173,
+        "recall": 0.1702127659574468,
+        "f1": 0.22857142857142856,
+        "roc_auc": 0.755103798776811
+      },
+      "top_features": [
+        {
+          "feature": "job_stability_index",
+          "importance": 0.08911444465180515,
+          "rank": 1
+        },
+        {
+          "feature": "Age",
+          "importance": 0.05959121825184711,
+          "rank": 2
+        },
+        {
+          "feature": "MonthlyIncome",
+          "importance": 0.05165576747828446,
+          "rank": 3
+        },
+        {
+          "feature": "compensation_per_experience",
+          "importance": 0.04520292904609031,
+          "rank": 4
+        },
+        {
+          "feature": "manager_tenure_share",
+          "importance": 0.044373511263049344,
+          "rank": 5
+        },
+        {
+          "feature": "OverTime_Yes",
+          "importance": 0.04141611723367968,
+          "rank": 6
+        },
+        {
+          "feature": "avg_satisfaction_score",
+          "importance": 0.04079472690521824,
+          "rank": 7
+        },
+        {
+          "feature": "TotalWorkingYears",
+          "importance": 0.04062558108477795,
+          "rank": 8
+        },
+        {
+          "feature": "DailyRate",
+          "importance": 0.0403728309204412,
+          "rank": 9
+        },
+        {
+          "feature": "income_vs_role_median",
+          "importance": 0.038411474251245636,
+          "rank": 10
+        },
+        {
+          "feature": "MonthlyRate",
+          "importance": 0.03283771527167348,
+          "rank": 11
+        },
+        {
+          "feature": "YearsAtCompany",
+          "importance": 0.032695740341868514,
+          "rank": 12
+        },
+        {
+          "feature": "StockOptionLevel",
+          "importance": 0.031218024293945885,
+          "rank": 13
+        },
+        {
+          "feature": "HourlyRate",
+          "importance": 0.029930516336615094,
+          "rank": 14
+        },
+        {
+          "feature": "DistanceFromHome",
+          "importance": 0.028720046697837773,
+          "rank": 15
+        }
+      ]
+    },
+    {
+      "name": "xgboost",
+      "metrics": {
+        "accuracy": 0.826530612244898,
+        "precision": 0.43333333333333335,
+        "recall": 0.2765957446808511,
+        "f1": 0.33766233766233766,
+        "roc_auc": 0.7656990266172796
+      },
+      "top_features": [
+        {
+          "feature": "job_stability_index",
+          "importance": 0.0468561165034771,
+          "rank": 1
+        },
+        {
+          "feature": "OverTime_Yes",
+          "importance": 0.046284034848213196,
+          "rank": 2
+        },
+        {
+          "feature": "burnout_risk_flag",
+          "importance": 0.043621402233839035,
+          "rank": 3
+        },
+        {
+          "feature": "JobRole_Human Resources",
+          "importance": 0.03842468932271004,
+          "rank": 4
+        },
+        {
+          "feature": "JobRole_Manager",
+          "importance": 0.03301570937037468,
+          "rank": 5
+        },
+        {
+          "feature": "StockOptionLevel",
+          "importance": 0.02802230417728424,
+          "rank": 6
+        },
+        {
+          "feature": "JobRole_Sales Executive",
+          "importance": 0.027612825855612755,
+          "rank": 7
+        },
+        {
+          "feature": "EducationField_Technical Degree",
+          "importance": 0.02678467333316803,
+          "rank": 8
+        },
+        {
+          "feature": "avg_satisfaction_score",
+          "importance": 0.025808705016970634,
+          "rank": 9
+        },
+        {
+          "feature": "Age",
+          "importance": 0.02469751238822937,
+          "rank": 10
+        },
+        {
+          "feature": "PerformanceRating",
+          "importance": 0.024353787302970886,
+          "rank": 11
+        },
+        {
+          "feature": "JobRole_Sales Representative",
+          "importance": 0.024214211851358414,
+          "rank": 12
+        },
+        {
+          "feature": "JobRole_Research Scientist",
+          "importance": 0.02242014929652214,
+          "rank": 13
+        },
+        {
+          "feature": "JobRole_Manufacturing Director",
+          "importance": 0.021004443988204002,
+          "rank": 14
+        },
+        {
+          "feature": "EducationField_Other",
+          "importance": 0.020475957542657852,
+          "rank": 15
+        }
+      ]
+    }
+  ]
+}
