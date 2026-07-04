@@ -36,7 +36,12 @@ AttriSense-Employee-Attrition-Prediction/
 ├── src/attrisense/    # Reusable Python package
 ├── models/            # Trained model artifacts
 ├── reports/figures/   # EDA and evaluation plots
-├── app/               # Streamlit application
+├── app/               # Streamlit multi-page application
+│   ├── main.py        # Entry point (`streamlit run app/main.py`)
+│   ├── components/    # Shared UI and charts
+│   ├── pages/         # Home, Explorer, EDA, Prediction, Insights, About
+│   ├── services/      # Cached data and prediction helpers
+│   └── styles/        # Custom HR analytics theme
 └── tests/
 ```
 
@@ -84,11 +89,15 @@ Notebooks are meant to be read in order. Each explains *why* a step is taken, no
 
 ## Running the App
 
+Requires trained model artifacts (`models/best_model.joblib`) from the training/evaluation pipeline.
+
 ```bash
 streamlit run app/main.py
 ```
 
-*(Available after the deployment phase is complete.)*
+**Pages:** Home · Dataset Explorer · EDA Dashboard · Prediction · Model Insights · About
+
+The app runs entirely locally — no authentication, cloud services, or external API calls.
 
 ---
 

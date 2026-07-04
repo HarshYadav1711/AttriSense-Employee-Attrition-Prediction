@@ -1,0 +1,202 @@
+/* AttriSense — internal HR analytics theme */
+
+:root {
+    --as-navy: #1e3a5f;
+    --as-navy-light: #2d4a73;
+    --as-slate: #475569;
+    --as-bg: #f8fafc;
+    --as-card: #ffffff;
+    --as-border: #e2e8f0;
+    --as-accent: #2563eb;
+    --as-success: #059669;
+    --as-warning: #d97706;
+    --as-danger: #dc2626;
+}
+
+/* App background */
+.stApp {
+    background-color: var(--as-bg);
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: var(--as-navy);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+section[data-testid="stSidebar"] * {
+    color: #f1f5f9 !important;
+}
+
+section[data-testid="stSidebar"] .stRadio label {
+    font-weight: 500;
+}
+
+section[data-testid="stSidebar"] hr {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Headers */
+.as-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--as-navy);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.as-page-subtitle {
+    font-size: 1rem;
+    color: var(--as-slate);
+    margin-bottom: 1.5rem;
+}
+
+.as-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--as-navy);
+    margin: 1.25rem 0 0.75rem 0;
+    padding-bottom: 0.35rem;
+    border-bottom: 2px solid var(--as-border);
+}
+
+/* Metric cards */
+div[data-testid="stMetric"] {
+    background: var(--as-card);
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+div[data-testid="stMetric"] label {
+    color: var(--as-slate) !important;
+    font-size: 0.85rem !important;
+}
+
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+    color: var(--as-navy) !important;
+    font-weight: 700 !important;
+}
+
+/* Hero banner */
+.as-hero {
+    background: linear-gradient(135deg, var(--as-navy) 0%, var(--as-navy-light) 100%);
+    color: #ffffff;
+    padding: 1.75rem 2rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(30, 58, 95, 0.15);
+}
+
+.as-hero h1 {
+    color: #ffffff !important;
+    font-size: 1.85rem !important;
+    margin: 0 0 0.5rem 0 !important;
+    font-weight: 700 !important;
+}
+
+.as-hero p {
+    color: rgba(255, 255, 255, 0.88) !important;
+    margin: 0 !important;
+    font-size: 1rem !important;
+}
+
+/* Info cards */
+.as-card {
+    background: var(--as-card);
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.as-card-title {
+    font-weight: 600;
+    color: var(--as-navy);
+    margin-bottom: 0.5rem;
+}
+
+/* Risk badges */
+.as-risk-high {
+    background: #fef2f2;
+    color: var(--as-danger);
+    border: 1px solid #fecaca;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.as-risk-elevated {
+    background: #fff7ed;
+    color: var(--as-warning);
+    border: 1px solid #fed7aa;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.as-risk-moderate {
+    background: #eff6ff;
+    color: var(--as-accent);
+    border: 1px solid #bfdbfe;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.as-risk-low {
+    background: #ecfdf5;
+    color: var(--as-success);
+    border: 1px solid #a7f3d0;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+/* Form sections */
+.as-form-section {
+    background: var(--as-card);
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+}
+
+/* Footer */
+.as-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--as-border);
+    color: var(--as-slate);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .as-hero {
+        padding: 1.25rem;
+    }
+
+    .as-hero h1 {
+        font-size: 1.45rem !important;
+    }
+
+    .as-page-title {
+        font-size: 1.45rem;
+    }
+}
+
+/* Hide Streamlit branding for cleaner internal-tool feel */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
