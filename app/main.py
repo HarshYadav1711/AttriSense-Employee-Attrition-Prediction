@@ -7,12 +7,22 @@ from pathlib import Path
 
 # Ensure project root is importable when launched via `streamlit run app/main.py`
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-import streamlit as st
+import streamlit as st  # noqa: E402
 
-from app.pages import about, dataset_explorer, eda_dashboard, home, model_insights, prediction
+from app.pages import (  # noqa: E402
+    about,
+    dataset_explorer,
+    eda_dashboard,
+    home,
+    model_insights,
+    prediction,
+)
 
 st.set_page_config(
     page_title="AttriSense · HR Analytics",

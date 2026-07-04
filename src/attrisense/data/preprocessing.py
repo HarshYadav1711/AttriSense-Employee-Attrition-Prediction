@@ -7,15 +7,12 @@ from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from attrisense.config import ProjectConfig, load_config
 from attrisense.data.cleaning import (
-    clean_raw_data,
     drop_uninformative_columns,
     validate_no_missing_values,
     validate_target_values,

@@ -23,6 +23,8 @@ data/raw/*.zip
 # Model and report outputs
 models/*.joblib
 models/*.pkl
+models/training_results.json
+models/evaluation_results.json
 reports/figures/*
 !reports/figures/.gitkeep
 

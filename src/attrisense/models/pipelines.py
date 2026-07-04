@@ -15,6 +15,12 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from attrisense.config import ProjectConfig, load_config
 
 
+def get_transformed_feature_names(pipeline: Pipeline) -> list[str]:
+    """Return post-preprocessing feature names from a fitted pipeline."""
+    preprocessor = pipeline.named_steps["preprocessor"]
+    return list(preprocessor.get_feature_names_out())
+
+
 def split_feature_groups(
     feature_names: list[str],
     config: ProjectConfig | None = None,

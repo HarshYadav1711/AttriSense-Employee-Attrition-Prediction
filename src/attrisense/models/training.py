@@ -17,16 +17,17 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
-from attrisense.config import ModelingConfig, ProjectConfig, load_config
+from attrisense.config import ProjectConfig, load_config
+from attrisense.models.metrics import classification_metrics
 from attrisense.models.pipelines import build_model_pipeline
-from attrisense.utils.paths import DATA_PROCESSED_DIR, MODELS_DIR
+from attrisense.utils.paths import DATA_PROCESSED_DIR, MODELS_DIR, relative_to_project
 
 
 @dataclass
@@ -107,22 +108,10 @@ def stratified_train_test_split(
     )
 
 
-def _classification_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray) -> dict[str, float]:
-    from sklearn.metrics import (
-        accuracy_score,
-        f1_score,
-        precision_score,
-        recall_score,
-        roc_auc_score,
-    )
-
-    return {
-        "accuracy": float(accuracy_score(y_true, y_pred)),
-        "precision": float(precision_score(y_true, y_pred, zero_division=0)),
-        "recall": float(recall_score(y_true, y_pred, zero_division=0)),
-        "f1": float(f1_score(y_true, y_pred, zero_division=0)),
-        "roc_auc": float(roc_auc_score(y_true, y_prob)),
-    }
+def _classification_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray
+) -> dict[str, float]:
+    return classification_metrics(y_true, y_pred, y_prob)
 
 
 def _evaluate_pipeline(
@@ -259,7 +248,7 @@ def train_single_model(
         cv_scoring=mcfg.scoring,
         train_metrics=train_metrics,
         test_metrics=test_metrics,
-        model_path=str(model_path),
+        model_path=relative_to_project(model_path),
     )
 
 
@@ -343,7 +332,7 @@ def run_training_pipeline(
         random_state=cfg.random_state,
         results=results,
         comparison=comparison,
-        results_path=str(results_path),
+        results_path=relative_to_project(results_path),
     )
 
 

@@ -7,7 +7,13 @@ from app.components.charts import (
     attrition_by_category_chart,
     satisfaction_chart,
 )
-from app.components.layout import load_theme, page_footer, page_header, render_metric_row, section_title
+from app.components.layout import (
+    load_theme,
+    page_footer,
+    page_header,
+    render_metric_row,
+    section_title,
+)
 from app.services.data_service import get_raw_data
 
 

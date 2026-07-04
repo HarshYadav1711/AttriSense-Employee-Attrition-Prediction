@@ -13,7 +13,12 @@ from attrisense.models.evaluation import (
     run_evaluation_pipeline,
     select_best_model,
 )
-from attrisense.models.pipelines import build_model_pipeline, build_preprocessor, split_feature_groups
+from attrisense.models.pipelines import (
+    build_model_pipeline,
+    build_preprocessor,
+    get_transformed_feature_names,
+    split_feature_groups,
+)
 from attrisense.models.training import (
     ModelTrainingResult,
     TrainingReport,
@@ -37,6 +42,7 @@ __all__ = [
     "evaluate_single_model",
     "extract_feature_importance",
     "get_model_specs",
+    "get_transformed_feature_names",
     "load_selected_features",
     "load_trained_model",
     "plot_confusion_matrices",

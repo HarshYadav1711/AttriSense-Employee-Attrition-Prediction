@@ -49,8 +49,19 @@ streamlit run app/main.py
 |----------|----------|
 | [docs/WORKFLOW.md](docs/WORKFLOW.md) | End-to-end pipeline, notebooks, artifacts, reproducibility |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design, module layout, data flow |
+| [notebooks/README.md](notebooks/README.md) | Notebook order and output clearing |
 
 Configuration lives in `configs/config.yaml` (paths, feature types, model hyperparameters, random seed).
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest
+python scripts/run_pipeline.py
+python scripts/clear_notebook_outputs.py   # before committing notebooks
+ruff check src app scripts tests
+```
 
 ## Project layout
 

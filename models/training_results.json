@@ -28,7 +28,7 @@
         "f1": 0.5,
         "roc_auc": 0.8164355241622878
       },
-      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\logistic_regression.joblib"
+      "model_path": "models/logistic_regression.joblib"
     },
     {
       "name": "decision_tree",
@@ -52,7 +52,7 @@
         "f1": 0.34234234234234234,
         "roc_auc": 0.6550951847704367
       },
-      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\decision_tree.joblib"
+      "model_path": "models/decision_tree.joblib"
     },
     {
       "name": "random_forest",
@@ -77,7 +77,7 @@
         "f1": 0.22857142857142856,
         "roc_auc": 0.755103798776811
       },
-      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\random_forest.joblib"
+      "model_path": "models/random_forest.joblib"
     },
     {
       "name": "xgboost",
@@ -103,7 +103,7 @@
         "f1": 0.33766233766233766,
         "roc_auc": 0.7656990266172796
       },
-      "model_path": "D:\\Fun\\AttriSense-Employee-Attrition-Prediction\\models\\xgboost.joblib"
+      "model_path": "models/xgboost.joblib"
     }
   ]
 }

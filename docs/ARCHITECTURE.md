@@ -46,7 +46,7 @@ AttriSense is organized as a **config-driven ML pipeline** with a separate **pre
 
 ### Training path
 
-1. **Raw CSV** → `clean_raw_data()` removes zero-variance columns
+1. **Raw CSV** → preprocessing pipeline removes zero-variance columns and validates target
 2. **Preprocessing** → deduplication, nominal encoding artifacts, cleaned/preprocessed parquet
 3. **Feature engineering** → 8 derived features (e.g. `job_stability_index`, `burnout_risk_flag`); drops redundant pairs (e.g. `JobLevel` vs `MonthlyIncome`)
 4. **Training** → stratified 80/20 split; 5-fold CV with ROC-AUC scoring; four models tuned via `GridSearchCV`

@@ -8,7 +8,6 @@ from attrisense.data.cleaning import (
     validate_no_missing_values,
     validate_target_values,
 )
-from attrisense.data.features import FEATURE_REGISTRY, feature_registry_dataframe
 from attrisense.data.feature_engineering import (
     ENGINEERED_FEATURE_SPECS,
     FeatureEngineeringReport,
@@ -22,6 +21,7 @@ from attrisense.data.feature_engineering import (
     resolve_redundancy,
     run_feature_engineering_pipeline,
 )
+from attrisense.data.features import FEATURE_REGISTRY, feature_registry_dataframe
 from attrisense.data.loader import dataset_summary, load_raw_data
 from attrisense.data.preprocessing import (
     PreprocessingReport,

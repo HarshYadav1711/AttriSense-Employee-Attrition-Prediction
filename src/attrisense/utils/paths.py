@@ -39,3 +39,16 @@ DATA_RAW_DIR = PROJECT_ROOT / "data" / "raw"
 DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
 MODELS_DIR = PROJECT_ROOT / "models"
 REPORTS_FIGURES_DIR = PROJECT_ROOT / "reports" / "figures"
+
+
+def relative_to_project(path: Path) -> str:
+    """Return *path* relative to the project root, using forward slashes."""
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.name
+
+
+def resolve_project_path(relative: str) -> Path:
+    """Resolve a project-relative path string to an absolute path."""
+    return PROJECT_ROOT / relative

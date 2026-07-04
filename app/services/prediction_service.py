@@ -6,13 +6,12 @@ import pandas as pd
 import streamlit as st
 
 from attrisense.inference import (
-    INPUT_COLUMNS,
     PredictionResult,
     ShapExplanation,
     build_prediction_dataframe,
     compute_shap_explanation,
+    get_input_columns,
     predict_attrition,
-    shap_contributions_table,
     validate_dataframe,
     validate_employee_record,
 )
@@ -99,4 +98,4 @@ def validate_batch(df: pd.DataFrame):
 
 def input_schema_dataframe() -> pd.DataFrame:
     """Document required upload columns."""
-    return pd.DataFrame({"RequiredColumn": INPUT_COLUMNS})
+    return pd.DataFrame({"RequiredColumn": get_input_columns()})

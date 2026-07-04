@@ -2,7 +2,13 @@
 
 import streamlit as st
 
-from app.components.layout import load_theme, page_footer, page_header, render_metric_row, section_title
+from app.components.layout import (
+    load_theme,
+    page_footer,
+    page_header,
+    render_metric_row,
+    section_title,
+)
 from app.services.data_service import get_config, get_raw_data
 
 

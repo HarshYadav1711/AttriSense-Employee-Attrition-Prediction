@@ -23,7 +23,7 @@ def render() -> None:
 
     section_title("Architecture")
     st.markdown(
-        f"""
+        """
         | Layer | Location |
         |-------|----------|
         | Configuration | `configs/config.yaml` |

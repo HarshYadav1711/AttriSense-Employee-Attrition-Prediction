@@ -2,7 +2,13 @@
 
 import streamlit as st
 
-from app.components.layout import load_theme, page_footer, page_header, render_hero, render_metric_row
+from app.components.layout import (
+    load_theme,
+    page_footer,
+    page_header,
+    render_hero,
+    render_metric_row,
+)
 from app.services.data_service import get_dataset_stats, get_evaluation_results, get_raw_data
 
 
@@ -18,6 +24,9 @@ def render() -> None:
     df = get_raw_data()
     attrition_rate = (df["Attrition"] == "Yes").mean() * 100
     eval_results = get_evaluation_results()
+    best_auc = None
+    if eval_results and eval_results.get("metrics_comparison"):
+        best_auc = eval_results["metrics_comparison"][0]["roc_auc"]
 
     render_metric_row(
         [
@@ -26,8 +35,8 @@ def render() -> None:
             ("Attrition Rate", f"{attrition_rate:.1f}%", "Imbalanced"),
             (
                 "Model ROC-AUC",
-                f"{eval_results['metrics_comparison'][0]['roc_auc']:.3f}" if eval_results else "N/A",
-                "Test set" if eval_results else None,
+                f"{best_auc:.3f}" if best_auc is not None else "N/A",
+                "Test set" if best_auc is not None else None,
             ),
         ]
     )

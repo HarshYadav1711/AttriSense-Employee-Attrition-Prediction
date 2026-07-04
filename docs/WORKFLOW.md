@@ -128,7 +128,7 @@ Edit `configs/config.yaml`, then rerun from the affected stage:
 
 **Streamlit import errors** — Use the project virtualenv; run `pip install -r requirements.txt` inside it.
 
-**SHAP warning about background samples** — Informational only; explanation still computed on a 100-row background sample.
+**SHAP warning about background samples** — Informational only; explanations use a 120-row background sample (see `DEFAULT_SHAP_BACKGROUND_SIZE` in `inference.py`).
 
 ## Inference-only usage
 

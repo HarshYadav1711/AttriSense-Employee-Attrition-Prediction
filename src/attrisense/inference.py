@@ -1,8 +1,8 @@
 """Inference helpers for attrition prediction and SHAP explanations.
 
-Provides the runtime path from raw employee input (29 base columns) through
-feature engineering to model scoring. Used by the Streamlit app and available
-for programmatic batch scoring:
+Provides the runtime path from raw employee input through feature engineering
+to model scoring. Used by the Streamlit app and available for programmatic
+batch scoring::
 
     from attrisense.inference import predict_attrition, build_prediction_dataframe
 """
@@ -25,8 +25,24 @@ from attrisense.data.feature_engineering import (
     FeatureEngineeringState,
     apply_engineered_features,
 )
-from attrisense.models.evaluation import get_transformed_feature_names
+from attrisense.models.pipelines import get_transformed_feature_names
+from attrisense.models.training import load_selected_features
 from attrisense.utils.paths import DATA_PROCESSED_DIR, MODELS_DIR
+
+# Validation and risk-scoring defaults (also used by the Streamlit form).
+DEFAULT_DECISION_THRESHOLD = 0.5
+DEFAULT_SHAP_BACKGROUND_SIZE = 120
+MAX_BATCH_VALIDATION_ERRORS = 20
+DEFAULT_SHAP_TOP_N = 12
+AGE_MIN = 18
+AGE_MAX = 70
+
+RISK_TIERS = (
+    (0.60, "High"),
+    (0.40, "Elevated"),
+    (0.25, "Moderate"),
+    (0.0, "Low"),
+)
 
 
 @dataclass
@@ -60,44 +76,23 @@ class ShapExplanation:
     feature_values: np.ndarray
 
 
-INPUT_COLUMNS: list[str] = [
-    "Education",
-    "EnvironmentSatisfaction",
-    "JobInvolvement",
-    "JobSatisfaction",
-    "PerformanceRating",
-    "RelationshipSatisfaction",
-    "StockOptionLevel",
-    "WorkLifeBalance",
-    "BusinessTravel",
-    "Department",
-    "EducationField",
-    "Gender",
-    "JobRole",
-    "MaritalStatus",
-    "OverTime",
-    "Age",
-    "DailyRate",
-    "DistanceFromHome",
-    "HourlyRate",
-    "MonthlyIncome",
-    "MonthlyRate",
-    "NumCompaniesWorked",
-    "PercentSalaryHike",
-    "TotalWorkingYears",
-    "TrainingTimesLastYear",
-    "YearsAtCompany",
-    "YearsInCurrentRole",
-    "YearsSinceLastPromotion",
-    "YearsWithCurrManager",
-]
+def get_input_columns(
+    config: ProjectConfig | None = None,
+    models_dir: Path | None = None,
+) -> list[str]:
+    """Return base feature columns required before feature engineering.
 
-RISK_TIERS = (
-    (0.60, "High"),
-    (0.40, "Elevated"),
-    (0.25, "Moderate"),
-    (0.0, "Low"),
-)
+    Derived from ``model_feature_columns`` minus features dropped during
+    redundancy resolution (e.g. ``JobLevel``).
+    """
+    cfg = config or load_config()
+    mdir = models_dir or MODELS_DIR
+    path = mdir / "selected_features.json"
+    dropped: set[str] = set()
+    if path.exists():
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        dropped = set(payload.get("dropped_features", []))
+    return [col for col in cfg.model_feature_columns if col not in dropped]
 
 
 def load_best_model(models_dir: Path | None = None) -> Pipeline:
@@ -120,13 +115,6 @@ def load_feature_state(models_dir: Path | None = None) -> FeatureEngineeringStat
     return joblib.load(path)
 
 
-def load_selected_features(models_dir: Path | None = None) -> list[str]:
-    """Load the model feature list."""
-    path = (models_dir or MODELS_DIR) / "selected_features.json"
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    return list(payload["selected_features"])
-
-
 def risk_tier(probability: float) -> str:
     """Map attrition probability to an HR-facing risk label."""
     for threshold, label in RISK_TIERS:
@@ -143,13 +131,14 @@ def prediction_confidence(probability: float) -> float:
 def validate_employee_record(
     record: dict[str, Any],
     config: ProjectConfig | None = None,
+    models_dir: Path | None = None,
 ) -> list[ValidationIssue]:
     """Validate a single employee input record."""
     cfg = config or load_config()
     issues: list[ValidationIssue] = []
+    input_columns = get_input_columns(cfg, models_dir)
 
-    required = set(INPUT_COLUMNS)
-    for field in required:
+    for field in input_columns:
         value = record.get(field)
         if value is None or (isinstance(value, str) and not value.strip()):
             issues.append(ValidationIssue(field, "Required field is missing.", "error"))
@@ -174,10 +163,8 @@ def validate_employee_record(
     ):
         issues.append(ValidationIssue("StockOptionLevel", "Must be between 0 and 3.", "error"))
 
-    if record.get("PerformanceRating") is not None and int(record["PerformanceRating"]) not in (
-        3,
-        4,
-    ):
+    performance = record.get("PerformanceRating")
+    if performance is not None and int(performance) not in (3, 4):
         issues.append(
             ValidationIssue(
                 "PerformanceRating",
@@ -186,8 +173,11 @@ def validate_employee_record(
             )
         )
 
-    if record.get("Age") is not None and not (18 <= int(record["Age"]) <= 70):
-        issues.append(ValidationIssue("Age", "Must be between 18 and 70.", "error"))
+    age = record.get("Age")
+    if age is not None and not (AGE_MIN <= int(age) <= AGE_MAX):
+        issues.append(
+            ValidationIssue("Age", f"Must be between {AGE_MIN} and {AGE_MAX}.", "error")
+        )
 
     if record.get("MonthlyIncome") is not None and int(record["MonthlyIncome"]) <= 0:
         issues.append(ValidationIssue("MonthlyIncome", "Must be greater than zero.", "error"))
@@ -195,7 +185,11 @@ def validate_employee_record(
     tenure_checks = [
         ("YearsInCurrentRole", "YearsAtCompany", "Role tenure cannot exceed company tenure."),
         ("YearsWithCurrManager", "YearsAtCompany", "Manager tenure cannot exceed company tenure."),
-        ("YearsSinceLastPromotion", "YearsAtCompany", "Years since promotion cannot exceed company tenure."),
+        (
+            "YearsSinceLastPromotion",
+            "YearsAtCompany",
+            "Years since promotion cannot exceed company tenure.",
+        ),
         ("YearsAtCompany", "TotalWorkingYears", "Company tenure cannot exceed total working years."),
     ]
     for left, right, message in tenure_checks:
@@ -206,19 +200,23 @@ def validate_employee_record(
     if record.get("OverTime") not in (None, "Yes", "No"):
         issues.append(ValidationIssue("OverTime", "Must be 'Yes' or 'No'.", "error"))
 
-    nominal = cfg.features.nominal
-    for field in nominal:
+    for field in cfg.features.nominal:
         value = record.get(field)
-        if value is not None and field in nominal and isinstance(value, str) and not value.strip():
+        if value is not None and isinstance(value, str) and not value.strip():
             issues.append(ValidationIssue(field, "Invalid category.", "error"))
 
     return issues
 
 
-def validate_dataframe(df: pd.DataFrame) -> list[ValidationIssue]:
+def validate_dataframe(
+    df: pd.DataFrame,
+    config: ProjectConfig | None = None,
+    models_dir: Path | None = None,
+) -> list[ValidationIssue]:
     """Validate a batch upload DataFrame."""
+    input_columns = get_input_columns(config, models_dir)
     issues: list[ValidationIssue] = []
-    missing_cols = [c for c in INPUT_COLUMNS if c not in df.columns]
+    missing_cols = [col for col in input_columns if col not in df.columns]
     if missing_cols:
         issues.append(
             ValidationIssue(
@@ -233,8 +231,9 @@ def validate_dataframe(df: pd.DataFrame) -> list[ValidationIssue]:
         issues.append(ValidationIssue("rows", "Upload contains no data rows.", "error"))
         return issues
 
+    error_count = 0
     for idx, row in df.iterrows():
-        row_issues = validate_employee_record(row.to_dict())
+        row_issues = validate_employee_record(row.to_dict(), config, models_dir)
         for issue in row_issues:
             issues.append(
                 ValidationIssue(
@@ -243,8 +242,12 @@ def validate_dataframe(df: pd.DataFrame) -> list[ValidationIssue]:
                     issue.severity,
                 )
             )
-        if len([i for i in issues if i.severity == "error"]) >= 20:
-            issues.append(ValidationIssue("rows", "Additional row errors omitted.", "warning"))
+            if issue.severity == "error":
+                error_count += 1
+        if error_count >= MAX_BATCH_VALIDATION_ERRORS:
+            issues.append(
+                ValidationIssue("rows", "Additional row errors omitted.", "warning")
+            )
             break
 
     return issues
@@ -259,8 +262,9 @@ def prepare_feature_matrix(
     cfg = config or load_config()
     state = load_feature_state(models_dir)
     features = load_selected_features(models_dir)
+    input_columns = get_input_columns(cfg, models_dir)
 
-    working = df[INPUT_COLUMNS].copy()
+    working = df[input_columns].copy()
     featured = apply_engineered_features(working, state, cfg)
     return featured[features].copy()
 
@@ -270,7 +274,7 @@ def predict_attrition(
     employee_id_col: str | None = "EmployeeNumber",
     config: ProjectConfig | None = None,
     models_dir: Path | None = None,
-    threshold: float = 0.5,
+    threshold: float = DEFAULT_DECISION_THRESHOLD,
 ) -> PredictionResult:
     """Run attrition prediction on one or more employee records."""
     pipeline = load_best_model(models_dir)
@@ -278,17 +282,16 @@ def predict_attrition(
 
     probabilities = pipeline.predict_proba(feature_frame)[:, 1]
     predictions = (probabilities >= threshold).astype(int)
-    ids: list[str | int]
     if employee_id_col and employee_id_col in df.columns:
-        ids = df[employee_id_col].tolist()
+        employee_ids = df[employee_id_col].tolist()
     else:
-        ids = list(range(1, len(df) + 1))
+        employee_ids = list(range(1, len(df) + 1))
 
     return PredictionResult(
-        employee_ids=ids,
+        employee_ids=employee_ids,
         probabilities=probabilities,
         predictions=predictions,
-        risk_tiers=[risk_tier(p) for p in probabilities],
+        risk_tiers=[risk_tier(probability) for probability in probabilities],
         confidence_scores=np.array([prediction_confidence(p) for p in probabilities]),
         feature_frame=feature_frame,
     )
@@ -311,7 +314,7 @@ def compute_shap_explanation(
     feature_frame: pd.DataFrame,
     row_index: int = 0,
     models_dir: Path | None = None,
-    background_size: int = 120,
+    background_size: int = DEFAULT_SHAP_BACKGROUND_SIZE,
 ) -> ShapExplanation:
     """Compute SHAP values for a single prediction using the linear model."""
     pipeline = load_best_model(models_dir)
@@ -351,15 +354,67 @@ def compute_shap_explanation(
     )
 
 
-def shap_contributions_table(explanation: ShapExplanation, top_n: int = 12) -> pd.DataFrame:
+def shap_contributions_table(
+    explanation: ShapExplanation,
+    top_n: int = DEFAULT_SHAP_TOP_N,
+) -> pd.DataFrame:
     """Return top SHAP contributors as a sorted DataFrame."""
-    df = pd.DataFrame(
+    contributions = pd.DataFrame(
         {
             "feature": explanation.feature_names,
             "shap_value": explanation.shap_values,
             "feature_value": explanation.feature_values,
         }
     )
-    df["abs_shap"] = df["shap_value"].abs()
-    df["direction"] = np.where(df["shap_value"] >= 0, "Increases risk", "Decreases risk")
-    return df.sort_values("abs_shap", ascending=False).head(top_n).drop(columns="abs_shap")
+    contributions["abs_shap"] = contributions["shap_value"].abs()
+    contributions["direction"] = np.where(
+        contributions["shap_value"] >= 0,
+        "Increases risk",
+        "Decreases risk",
+    )
+    return (
+        contributions.sort_values("abs_shap", ascending=False)
+        .head(top_n)
+        .drop(columns="abs_shap")
+    )
+
+
+# Backward-compatible alias for imports expecting a module-level list.
+def _input_columns_fallback() -> list[str]:
+    try:
+        return get_input_columns()
+    except (FileNotFoundError, OSError):
+        return [
+            "Education",
+            "EnvironmentSatisfaction",
+            "JobInvolvement",
+            "JobSatisfaction",
+            "PerformanceRating",
+            "RelationshipSatisfaction",
+            "StockOptionLevel",
+            "WorkLifeBalance",
+            "BusinessTravel",
+            "Department",
+            "EducationField",
+            "Gender",
+            "JobRole",
+            "MaritalStatus",
+            "OverTime",
+            "Age",
+            "DailyRate",
+            "DistanceFromHome",
+            "HourlyRate",
+            "MonthlyIncome",
+            "MonthlyRate",
+            "NumCompaniesWorked",
+            "PercentSalaryHike",
+            "TotalWorkingYears",
+            "TrainingTimesLastYear",
+            "YearsAtCompany",
+            "YearsInCurrentRole",
+            "YearsSinceLastPromotion",
+            "YearsWithCurrManager",
+        ]
+
+
+INPUT_COLUMNS: list[str] = _input_columns_fallback()

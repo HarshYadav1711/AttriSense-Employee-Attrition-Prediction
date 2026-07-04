@@ -18,24 +18,21 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
-    accuracy_score,
     confusion_matrix,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
     roc_curve,
 )
 from sklearn.pipeline import Pipeline
 
 from attrisense.config import ProjectConfig, load_config
+from attrisense.models.metrics import classification_metrics
+from attrisense.models.pipelines import get_transformed_feature_names
 from attrisense.models.training import (
     get_model_specs,
     load_trained_model,
     prepare_training_data,
     stratified_train_test_split,
 )
-from attrisense.utils.paths import MODELS_DIR, REPORTS_FIGURES_DIR
+from attrisense.utils.paths import MODELS_DIR, REPORTS_FIGURES_DIR, relative_to_project
 
 
 @dataclass
@@ -65,20 +62,10 @@ class EvaluationReport:
     results_path: str = ""
 
 
-def _compute_metrics(y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray) -> dict[str, float]:
-    return {
-        "accuracy": float(accuracy_score(y_true, y_pred)),
-        "precision": float(precision_score(y_true, y_pred, zero_division=0)),
-        "recall": float(recall_score(y_true, y_pred, zero_division=0)),
-        "f1": float(f1_score(y_true, y_pred, zero_division=0)),
-        "roc_auc": float(roc_auc_score(y_true, y_prob)),
-    }
-
-
-def get_transformed_feature_names(pipeline: Pipeline) -> list[str]:
-    """Return post-preprocessing feature names from a fitted pipeline."""
-    preprocessor = pipeline.named_steps["preprocessor"]
-    return list(preprocessor.get_feature_names_out())
+def _compute_metrics(
+    y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray
+) -> dict[str, float]:
+    return classification_metrics(y_true, y_pred, y_prob)
 
 
 def extract_feature_importance(
@@ -413,5 +400,5 @@ def run_evaluation_pipeline(
         metrics_comparison=comparison,
         best_model=best_model,
         selection_rationale=rationale,
-        results_path=str(results_path),
+        results_path=relative_to_project(results_path),
     )

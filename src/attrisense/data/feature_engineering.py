@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import OneHotEncoder
@@ -155,7 +154,6 @@ def fit_feature_engineering_state(
     config: ProjectConfig | None = None,
 ) -> FeatureEngineeringState:
     """Compute role-level income medians from the reference dataset."""
-    cfg = config or load_config()
     medians = df.groupby("JobRole")["MonthlyIncome"].median().to_dict()
     return FeatureEngineeringState(role_income_medians=medians)
 

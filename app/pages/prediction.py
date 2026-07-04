@@ -13,8 +13,6 @@ from app.components.layout import (
     section_title,
 )
 from app.services.data_service import get_categorical_options
-from attrisense.inference import shap_contributions_table
-
 from app.services.prediction_service import (
     default_employee_record,
     feature_frame_cache_key,
@@ -25,6 +23,7 @@ from app.services.prediction_service import (
     validate_batch,
     validate_single,
 )
+from attrisense.inference import shap_contributions_table
 
 
 def _render_confidence_gauge(probability: float, confidence: float) -> None:

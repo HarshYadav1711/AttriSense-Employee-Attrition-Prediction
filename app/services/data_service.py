@@ -1,8 +1,4 @@
-"""Cached data and model loaders for the Streamlit application.
-
-Wraps ``attrisense`` package functions with ``@st.cache_data`` / ``@st.cache_resource``
-to avoid reloading CSV, parquet, and joblib artifacts on every page interaction.
-"""
+"""Cached data loaders for the Streamlit application."""
 
 from __future__ import annotations
 
@@ -12,9 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from attrisense.config import load_config
-from attrisense.data import load_raw_data, dataset_summary
-from attrisense.data.feature_engineering import load_feature_engineered_data
-from attrisense.inference import load_best_model, load_selected_features
+from attrisense.data import dataset_summary, load_raw_data
 from attrisense.utils.paths import MODELS_DIR, REPORTS_FIGURES_DIR
 
 
@@ -31,24 +25,6 @@ def get_raw_data() -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def get_dataset_stats() -> dict:
     return dataset_summary(get_raw_data())
-
-
-@st.cache_data(show_spinner=False)
-def get_featured_data() -> pd.DataFrame | None:
-    try:
-        return load_feature_engineered_data(get_config())
-    except FileNotFoundError:
-        return None
-
-
-@st.cache_resource(show_spinner="Loading prediction model…")
-def get_model():
-    return load_best_model()
-
-
-@st.cache_data(show_spinner=False)
-def get_selected_features() -> list[str]:
-    return load_selected_features()
 
 
 @st.cache_data(show_spinner=False)
