@@ -1,0 +1,22 @@
+# AttriSense project configuration
+# All paths are relative to the repository root unless noted.
+
+random_state: 42
+
+data:
+  raw_filename: WA_Fn-UseC_-HR-Employee-Attrition.csv
+  processed_filename: employee_attrition_cleaned.parquet
+
+target:
+  column: Attrition
+  positive_class: "Yes"
+  negative_class: "No"
+
+# Columns with no predictive value (constant across all rows)
+drop_columns:
+  - EmployeeCount
+  - Over18
+  - StandardHours
+
+# Identifier — excluded from modeling features
+id_column: EmployeeNumber
