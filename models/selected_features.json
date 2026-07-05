@@ -45,8 +45,8 @@
     {
       "dropped": "JobLevel",
       "kept": "MonthlyIncome",
-      "correlation": 0.9503,
-      "reason": "|r|=0.950 with 'MonthlyIncome' (importance 0.0540 vs 0.0206)"
+      "correlation": 0.947,
+      "reason": "|r|=0.947 with 'MonthlyIncome' (importance 0.0510 vs 0.0167)"
     }
   ],
   "random_state": 42

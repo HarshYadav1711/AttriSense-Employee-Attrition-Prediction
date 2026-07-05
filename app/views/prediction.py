@@ -12,7 +12,7 @@ from app.components.layout import (
     render_validation_messages,
     section_title,
 )
-from app.services.data_service import get_categorical_options
+from app.services.data_service import get_categorical_options, get_optimal_threshold
 from app.services.prediction_service import (
     default_employee_record,
     feature_frame_cache_key,
@@ -26,11 +26,11 @@ from app.services.prediction_service import (
 from attrisense.inference import shap_contributions_table
 
 
-def _render_confidence_gauge(probability: float, confidence: float) -> None:
+def _render_confidence_gauge(probability: float, confidence: float, threshold: float) -> None:
     col1, col2, col3 = st.columns(3)
     col1.metric("Attrition Probability", f"{probability * 100:.1f}%")
     col2.metric("Confidence Score", f"{confidence * 100:.1f}%", help="Distance from uncertain (50%)")
-    prediction = "Yes" if probability >= 0.5 else "No"
+    prediction = "Yes" if probability >= threshold else "No"
     col3.metric("Predicted Outcome", prediction)
 
 
@@ -48,6 +48,7 @@ def _shap_bar_plot(contributions: pd.DataFrame) -> None:
 
 def _single_employee_form(options: dict) -> None:
     defaults = default_employee_record(options)
+    default_threshold = get_optimal_threshold()
 
     section_title("Employee Profile")
 
@@ -124,7 +125,7 @@ def _single_employee_form(options: dict) -> None:
         wlb = c13.slider("Work-Life Balance", 1, 4, defaults["WorkLifeBalance"])
         job_involvement = st.slider("Job Involvement", 1, 4, defaults["JobInvolvement"])
 
-        threshold = st.slider("Decision threshold", 0.1, 0.9, 0.5, 0.05)
+        threshold = st.slider("Decision threshold", 0.1, 0.9, default_threshold, 0.05)
         submitted = st.form_submit_button("Run Prediction", type="primary", use_container_width=True)
 
     if not submitted:
@@ -174,7 +175,7 @@ def _single_employee_form(options: dict) -> None:
     section_title("Prediction Result")
     st.markdown(render_risk_badge(tier), unsafe_allow_html=True)
     st.write("")
-    _render_confidence_gauge(prob, conf)
+    _render_confidence_gauge(prob, conf, threshold)
 
     st.caption(
         "Confidence reflects how far the probability is from 50% (uncertain). "
@@ -200,6 +201,7 @@ def _single_employee_form(options: dict) -> None:
 def _batch_upload_form() -> None:
     section_title("Batch Upload")
     st.markdown("Upload a CSV containing the required employee input columns.")
+    default_threshold = get_optimal_threshold()
 
     with st.expander("Required column schema"):
         st.dataframe(input_schema_dataframe(), use_container_width=True, hide_index=True)
@@ -216,7 +218,7 @@ def _batch_upload_form() -> None:
     )
 
     uploaded = st.file_uploader("Employee CSV", type=["csv"])
-    threshold = st.slider("Decision threshold (batch)", 0.1, 0.9, 0.5, 0.05, key="batch_threshold")
+    threshold = st.slider("Decision threshold (batch)", 0.1, 0.9, default_threshold, 0.05, key="batch_threshold")
 
     if uploaded is None:
         return

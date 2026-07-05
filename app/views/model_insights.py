@@ -54,18 +54,21 @@ def render() -> None:
     st.dataframe(comparison, use_container_width=True, hide_index=True)
 
     section_title("Generalization")
-    gen_rows = []
-    for model in training["models"]:
-        gen_rows.append(
-            {
-                "Model": model["name"].replace("_", " ").title(),
-                "Train AUC": round(model["train_metrics"]["roc_auc"], 4),
-                "Test AUC": round(model["test_metrics"]["roc_auc"], 4),
-                "AUC Gap": round(model["train_metrics"]["roc_auc"] - model["test_metrics"]["roc_auc"], 4),
-                "Test Precision": round(model["test_metrics"]["precision"], 4),
-            }
-        )
-    st.dataframe(pd.DataFrame(gen_rows), use_container_width=True, hide_index=True)
+    if "overfitting_report" in eval_results:
+        st.dataframe(pd.DataFrame(eval_results["overfitting_report"]), use_container_width=True, hide_index=True)
+    else:
+        gen_rows = []
+        for model in training["models"]:
+            gen_rows.append(
+                {
+                    "Model": model["name"].replace("_", " ").title(),
+                    "Train AUC": round(model["train_metrics"]["roc_auc"], 4),
+                    "Test AUC": round(model["test_metrics"]["roc_auc"], 4),
+                    "AUC Gap": round(model["train_metrics"]["roc_auc"] - model["test_metrics"]["roc_auc"], 4),
+                    "Test Precision": round(model["test_metrics"]["precision"], 4),
+                }
+            )
+        st.dataframe(pd.DataFrame(gen_rows), use_container_width=True, hide_index=True)
 
     section_title("Confusion Matrix — Best Model")
     cm = eval_results["confusion_matrices"][eval_results["best_model"]]
@@ -81,6 +84,29 @@ def render() -> None:
     else:
         st.info("ROC curve figure not found. Re-run evaluation to generate plots.")
 
+    section_title("Precision-Recall Curves")
+    pr_path = figures_dir() / "precision_recall_curves.png"
+    if pr_path.exists():
+        st.image(str(pr_path), use_container_width=True)
+
+    section_title("Calibration")
+    cal_path = figures_dir() / "calibration_curves.png"
+    if cal_path.exists():
+        st.image(str(cal_path), use_container_width=True)
+
+    if "optimal_threshold" in eval_results:
+        section_title("Decision Threshold")
+        st.markdown(
+            f"Optimal threshold (validation): **{eval_results['optimal_threshold']:.2f}** "
+            f"via `{eval_results.get('threshold_optimization', {}).get('method', 'f1')}` optimization."
+        )
+        if eval_results.get("threshold_analysis"):
+            st.dataframe(
+                pd.DataFrame(eval_results["threshold_analysis"]),
+                use_container_width=True,
+                hide_index=True,
+            )
+
     section_title("Feature Importance — Best Model")
     best_model_data = next(m for m in eval_results["models"] if m["name"] == eval_results["best_model"])
     importance_df = pd.DataFrame(best_model_data["top_features"])
@@ -94,7 +120,9 @@ def render() -> None:
     section_title("Saved Evaluation Figures")
     fdir = figures_dir()
     cols = st.columns(2)
-    for i, pattern in enumerate(["confusion_matrices.png", "metrics_comparison.png"]):
+    for i, pattern in enumerate(
+        ["confusion_matrices.png", "metrics_comparison.png", "precision_recall_curves.png", "calibration_curves.png"]
+    ):
         path = fdir / pattern
         if path.exists():
             cols[i % 2].image(str(path), caption=pattern.replace("_", " ").replace(".png", "").title())

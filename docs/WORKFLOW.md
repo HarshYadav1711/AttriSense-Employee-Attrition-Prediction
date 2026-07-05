@@ -26,7 +26,7 @@ Expected outputs:
 | Trained pipelines | `models/{logistic_regression,decision_tree,random_forest,xgboost}.joblib` |
 | Training summary | `models/training_results.json` |
 | Evaluation summary + best model | `models/evaluation_results.json`, `models/best_model.joblib` |
-| Comparison plots | `reports/figures/` |
+| Comparison plots | `reports/figures/` (ROC, PR, calibration, confusion matrices, metrics) |
 
 ## Step-by-step (Python API)
 
@@ -51,6 +51,8 @@ run_preprocessing_pipeline(raw, config=config)
 # 2. Feature engineering
 df = load_processed_data(config)
 run_feature_engineering_pipeline(df, config=config, save_artifacts=True)
+# Role medians, feature importance, and redundancy decisions are fit on the
+# training split only; transforms are applied to all rows before saving parquet.
 
 # 3. Training
 train_report = run_training_pipeline(config)
@@ -104,6 +106,7 @@ Single-employee and batch modes require the 29 columns defined in `attrisense.in
 | Train/test split | 80/20 stratified | `modeling.test_size` |
 | CV folds | 5 (stratified) | `modeling.cv_folds` |
 | Tuning metric | ROC-AUC | `modeling.scoring` |
+| Decision threshold | F1-max on validation split | `modeling.threshold_optimization` |
 
 All stochastic steps (split, CV shuffle, RF/XGB/SHAP background sampling) derive from the configured seed. Re-running `scripts/run_pipeline.py` on the same raw data produces identical metrics (verified on Python 3.11+ with pinned `requirements.txt` versions).
 

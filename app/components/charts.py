@@ -90,7 +90,17 @@ def satisfaction_chart(df: pd.DataFrame) -> go.Figure:
 
 def metrics_comparison_chart(comparison: pd.DataFrame) -> go.Figure:
     """Grouped bar chart of model metrics."""
-    metric_cols = ["accuracy", "precision", "recall", "f1", "roc_auc"]
+    preferred = [
+        "accuracy",
+        "precision",
+        "recall",
+        "f1",
+        "roc_auc",
+        "pr_auc",
+        "balanced_accuracy",
+        "mcc",
+    ]
+    metric_cols = [col for col in preferred if col in comparison.columns]
     melted = comparison.melt(id_vars="model", value_vars=metric_cols, var_name="Metric", value_name="Score")
     melted["model"] = melted["model"].str.replace("_", " ").str.title()
     fig = px.bar(

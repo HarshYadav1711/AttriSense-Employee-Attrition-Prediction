@@ -16,15 +16,25 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from sklearn.calibration import calibration_curve
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
     confusion_matrix,
+    precision_recall_curve,
     roc_curve,
 )
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 from attrisense.config import ProjectConfig, load_config
-from attrisense.models.metrics import classification_metrics
+from attrisense.models.metrics import (
+    classification_metrics,
+    classify_overfitting,
+    extended_classification_metrics,
+    find_optimal_threshold,
+    predictions_at_threshold,
+    threshold_analysis_table,
+)
 from attrisense.models.pipelines import get_transformed_feature_names
 from attrisense.models.training import (
     get_model_specs,
@@ -44,6 +54,10 @@ class ModelEvaluationResult:
     confusion_matrix: np.ndarray
     roc_fpr: np.ndarray
     roc_tpr: np.ndarray
+    pr_precision: np.ndarray
+    pr_recall: np.ndarray
+    calibration_fraction: np.ndarray
+    calibration_mean: np.ndarray
     feature_importance: pd.DataFrame
     y_pred: np.ndarray
     y_prob: np.ndarray
@@ -65,7 +79,9 @@ class EvaluationReport:
 def _compute_metrics(
     y_true: np.ndarray, y_pred: np.ndarray, y_prob: np.ndarray
 ) -> dict[str, float]:
-    return classification_metrics(y_true, y_pred, y_prob)
+    base = classification_metrics(y_true, y_pred, y_prob)
+    extended = extended_classification_metrics(y_true, y_pred, y_prob)
+    return {**base, **{k: v for k, v in extended.items() if k not in base}}
 
 
 def extract_feature_importance(
@@ -110,8 +126,15 @@ def evaluate_single_model(
     y_prob = pipeline.predict_proba(x_test)[:, 1]
 
     fpr, tpr, _ = roc_curve(y_true, y_prob)
+    precision, recall, _ = precision_recall_curve(y_true, y_prob)
     cm = confusion_matrix(y_true, y_pred)
     importance = extract_feature_importance(pipeline, model_name, top_n=top_features)
+
+    try:
+        cal_fraction, cal_mean = calibration_curve(y_true, y_prob, n_bins=10, strategy="uniform")
+    except ValueError:
+        cal_fraction = np.array([])
+        cal_mean = np.array([])
 
     return ModelEvaluationResult(
         model_name=model_name,
@@ -119,6 +142,10 @@ def evaluate_single_model(
         confusion_matrix=cm,
         roc_fpr=fpr,
         roc_tpr=tpr,
+        pr_precision=precision,
+        pr_recall=recall,
+        calibration_fraction=cal_fraction,
+        calibration_mean=cal_mean,
         feature_importance=importance,
         y_pred=y_pred,
         y_prob=y_prob,
@@ -135,10 +162,17 @@ def build_metrics_comparison(results: list[ModelEvaluationResult]) -> pd.DataFra
             "recall": round(r.metrics["recall"], 4),
             "f1": round(r.metrics["f1"], 4),
             "roc_auc": round(r.metrics["roc_auc"], 4),
+            "pr_auc": round(r.metrics["pr_auc"], 4),
+            "balanced_accuracy": round(r.metrics["balanced_accuracy"], 4),
+            "mcc": round(r.metrics["mcc"], 4),
         }
         for r in results
     ]
-    return pd.DataFrame(rows).sort_values("roc_auc", ascending=False).reset_index(drop=True)
+    return (
+        pd.DataFrame(rows)
+        .sort_values(["roc_auc", "pr_auc"], ascending=False)
+        .reset_index(drop=True)
+    )
 
 
 def _load_train_test_gap(model_name: str, training_payload: dict[str, Any]) -> float:
@@ -230,6 +264,117 @@ def plot_confusion_matrices(
         save_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
     return fig
+
+
+def plot_precision_recall_curves(
+    results: list[ModelEvaluationResult],
+    save_path: Path | None = None,
+) -> plt.Figure:
+    """Overlay precision-recall curves for all models."""
+    fig, ax = plt.subplots(figsize=(7, 5.5))
+
+    for result in results:
+        label = (
+            f"{result.model_name.replace('_', ' ').title()} "
+            f"(AP = {result.metrics['pr_auc']:.3f})"
+        )
+        ax.plot(result.pr_recall, result.pr_precision, lw=2, label=label)
+
+    ax.set_xlabel("Recall")
+    ax.set_ylabel("Precision")
+    ax.set_title("Precision-Recall Curves — Test Set")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
+    fig.tight_layout()
+    if save_path:
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    return fig
+
+
+def plot_calibration_curves(
+    results: list[ModelEvaluationResult],
+    save_path: Path | None = None,
+) -> plt.Figure:
+    """Plot reliability diagrams for all models."""
+    fig, ax = plt.subplots(figsize=(7, 5.5))
+
+    for result in results:
+        if len(result.calibration_fraction) == 0:
+            continue
+        label = (
+            f"{result.model_name.replace('_', ' ').title()} "
+            f"(Brier = {result.metrics['brier_score']:.3f})"
+        )
+        ax.plot(
+            result.calibration_mean,
+            result.calibration_fraction,
+            marker="o",
+            lw=2,
+            label=label,
+        )
+
+    ax.plot([0, 1], [0, 1], "k--", lw=1, label="Perfect calibration")
+    ax.set_xlabel("Mean Predicted Probability")
+    ax.set_ylabel("Fraction of Positives")
+    ax.set_title("Calibration Curves — Test Set")
+    ax.legend(loc="lower right", fontsize=9)
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
+    fig.tight_layout()
+    if save_path:
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    return fig
+
+
+def _build_overfitting_report(training_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """Summarize train–test ROC-AUC gaps and overfitting severity."""
+    rows: list[dict[str, Any]] = []
+    for model in training_payload.get("models", []):
+        train_auc = float(model["train_metrics"]["roc_auc"])
+        test_auc = float(model["test_metrics"]["roc_auc"])
+        gap = train_auc - test_auc
+        rows.append(
+            {
+                "model": model["name"],
+                "train_roc_auc": round(train_auc, 4),
+                "test_roc_auc": round(test_auc, 4),
+                "roc_auc_gap": round(gap, 4),
+                "overfitting_classification": classify_overfitting(gap),
+            }
+        )
+    return rows
+
+
+def _optimize_decision_threshold(
+    pipeline: Pipeline,
+    x_train: pd.DataFrame,
+    y_train: pd.Series,
+    config: ProjectConfig,
+) -> tuple[float, dict[str, float], list[dict[str, float]]]:
+    """Find optimal threshold on a validation split carved from training data."""
+    _, x_val, _, y_val = train_test_split(
+        x_train,
+        y_train,
+        test_size=0.2,
+        random_state=config.random_state,
+        stratify=y_train,
+    )
+    y_prob = pipeline.predict_proba(x_val)[:, 1]
+    method = config.modeling.threshold_optimization
+    optimal_threshold, threshold_metrics = find_optimal_threshold(
+        y_val.values,
+        y_prob,
+        method=method,
+    )
+    analysis = threshold_analysis_table(y_val.values, y_prob)
+    return optimal_threshold, {
+        "method": method,
+        "validation_size": len(x_val),
+        **threshold_metrics,
+    }, analysis
 
 
 def plot_roc_curves(
@@ -342,7 +487,7 @@ def run_evaluation_pipeline(
     names = model_names or list(get_model_specs(cfg).keys())
 
     x, y, _ = prepare_training_data(cfg)
-    _, x_test, _, y_test = stratified_train_test_split(x, y, cfg)
+    x_train, x_test, y_train, y_test = stratified_train_test_split(x, y, cfg)
 
     results: list[ModelEvaluationResult] = []
     for name in names:
@@ -356,11 +501,22 @@ def run_evaluation_pipeline(
         json.loads(training_path.read_text(encoding="utf-8")) if training_path.exists() else {}
     )
     best_model, rationale = select_best_model(results, training_payload)
+    overfitting_report = _build_overfitting_report(training_payload)
+
+    best_pipeline = load_trained_model(best_model, mdir)
+    optimal_threshold, threshold_summary, threshold_table = _optimize_decision_threshold(
+        best_pipeline,
+        x_train,
+        y_train,
+        cfg,
+    )
 
     if save_figures:
         fdir.mkdir(parents=True, exist_ok=True)
         plot_confusion_matrices(results, fdir / "confusion_matrices.png")
         plot_roc_curves(results, fdir / "roc_curves.png")
+        plot_precision_recall_curves(results, fdir / "precision_recall_curves.png")
+        plot_calibration_curves(results, fdir / "calibration_curves.png")
         plot_metrics_comparison(comparison, fdir / "metrics_comparison.png")
         for result in results:
             plot_feature_importance(
@@ -377,6 +533,10 @@ def run_evaluation_pipeline(
         "selection_rationale": rationale,
         "n_test": len(x_test),
         "positive_rate": float(y_test.mean()),
+        "optimal_threshold": optimal_threshold,
+        "threshold_optimization": threshold_summary,
+        "threshold_analysis": threshold_table,
+        "overfitting_report": overfitting_report,
         "metrics_comparison": comparison.to_dict(orient="records"),
         "confusion_matrices": {
             r.model_name: r.confusion_matrix.tolist() for r in results

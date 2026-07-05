@@ -12,22 +12,22 @@
       "name": "logistic_regression",
       "best_params": {
         "classifier__C": 10.0,
-        "classifier__solver": "saga"
+        "classifier__solver": "lbfgs"
       },
-      "cv_best_score": 0.8354278828898118,
+      "cv_best_score": 0.8356148986525691,
       "train_metrics": {
-        "accuracy": 0.8001700680272109,
-        "precision": 0.4358974358974359,
+        "accuracy": 0.8018707482993197,
+        "precision": 0.4383954154727794,
         "recall": 0.8052631578947368,
-        "f1": 0.5656192236598891,
-        "roc_auc": 0.8874132593146151
+        "f1": 0.5677179962894249,
+        "roc_auc": 0.8876961673961781
       },
       "test_metrics": {
-        "accuracy": 0.7755102040816326,
-        "precision": 0.38823529411764707,
+        "accuracy": 0.7721088435374149,
+        "precision": 0.38372093023255816,
         "recall": 0.7021276595744681,
-        "f1": 0.5,
-        "roc_auc": 0.8164355241622878
+        "f1": 0.49624060150375937,
+        "roc_auc": 0.8160909639073133
       },
       "model_path": "models/logistic_regression.joblib"
     },
@@ -38,13 +38,13 @@
         "classifier__min_samples_leaf": 1,
         "classifier__min_samples_split": 2
       },
-      "cv_best_score": 0.7294418942294978,
+      "cv_best_score": 0.7364795429583033,
       "train_metrics": {
         "accuracy": 0.8154761904761905,
         "precision": 0.449438202247191,
         "recall": 0.631578947368421,
         "f1": 0.5251641137855579,
-        "roc_auc": 0.8076758834205188
+        "roc_auc": 0.8095815095548201
       },
       "test_metrics": {
         "accuracy": 0.7517006802721088,
@@ -60,36 +60,10 @@
       "best_params": {
         "classifier__max_depth": null,
         "classifier__max_features": "log2",
-        "classifier__min_samples_split": 5,
+        "classifier__min_samples_split": 2,
         "classifier__n_estimators": 300
       },
-      "cv_best_score": 0.8088534287572493,
-      "train_metrics": {
-        "accuracy": 0.9948979591836735,
-        "precision": 0.9693877551020408,
-        "recall": 1.0,
-        "f1": 0.9844559585492227,
-        "roc_auc": 1.0
-      },
-      "test_metrics": {
-        "accuracy": 0.8197278911564626,
-        "precision": 0.4166666666666667,
-        "recall": 0.3191489361702128,
-        "f1": 0.3614457831325301,
-        "roc_auc": 0.749504694633474
-      },
-      "model_path": "models/random_forest.joblib"
-    },
-    {
-      "name": "xgboost",
-      "best_params": {
-        "classifier__colsample_bytree": 1.0,
-        "classifier__learning_rate": 0.1,
-        "classifier__max_depth": 7,
-        "classifier__n_estimators": 200,
-        "classifier__subsample": 0.8
-      },
-      "cv_best_score": 0.818456674681628,
+      "cv_best_score": 0.8081529967049603,
       "train_metrics": {
         "accuracy": 1.0,
         "precision": 1.0,
@@ -98,11 +72,37 @@
         "roc_auc": 1.0
       },
       "test_metrics": {
-        "accuracy": 0.826530612244898,
-        "precision": 0.43333333333333335,
-        "recall": 0.2765957446808511,
-        "f1": 0.33766233766233766,
-        "roc_auc": 0.7656990266172796
+        "accuracy": 0.8197278911564626,
+        "precision": 0.4,
+        "recall": 0.2553191489361702,
+        "f1": 0.3116883116883117,
+        "roc_auc": 0.7647514859160996
+      },
+      "model_path": "models/random_forest.joblib"
+    },
+    {
+      "name": "xgboost",
+      "best_params": {
+        "classifier__colsample_bytree": 0.8,
+        "classifier__learning_rate": 0.05,
+        "classifier__max_depth": 5,
+        "classifier__n_estimators": 300,
+        "classifier__subsample": 0.8
+      },
+      "cv_best_score": 0.8207799339912617,
+      "train_metrics": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0
+      },
+      "test_metrics": {
+        "accuracy": 0.8401360544217688,
+        "precision": 0.5,
+        "recall": 0.3191489361702128,
+        "f1": 0.38961038961038963,
+        "roc_auc": 0.765354466362305
       },
       "model_path": "models/xgboost.joblib"
     }

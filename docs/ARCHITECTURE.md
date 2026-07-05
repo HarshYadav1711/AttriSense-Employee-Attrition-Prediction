@@ -48,16 +48,16 @@ AttriSense is organized as a **config-driven ML pipeline** with a separate **pre
 
 1. **Raw CSV** → preprocessing pipeline removes zero-variance columns and validates target
 2. **Preprocessing** → deduplication, nominal encoding artifacts, cleaned/preprocessed parquet
-3. **Feature engineering** → 8 derived features (e.g. `job_stability_index`, `burnout_risk_flag`); drops redundant pairs (e.g. `JobLevel` vs `MonthlyIncome`)
+3. **Feature engineering** → 8 derived features (e.g. `job_stability_index`, `burnout_risk_flag`); role medians, importance ranking, and redundancy removal are fit on the training split only; drops redundant pairs (e.g. `JobLevel` vs `MonthlyIncome`)
 4. **Training** → stratified 80/20 split; 5-fold CV with ROC-AUC scoring; four models tuned via `GridSearchCV`
-5. **Evaluation** → test metrics, plots saved to `reports/figures/`, best model copied to `best_model.joblib`
+5. **Evaluation** → test metrics (ROC-AUC, PR-AUC, Brier, MCC), calibration and PR curves, threshold optimization on a validation split, overfitting report; plots saved to `reports/figures/`; best model copied to `best_model.joblib`
 
 ### Inference path
 
 1. User provides **29 base input columns** (see `inference.INPUT_COLUMNS`)
 2. `apply_engineered_features()` adds derived columns using saved `feature_engineering_state.joblib`
 3. Subset to **37 selected features** from `selected_features.json`
-4. `best_model.joblib` pipeline (preprocessor + Logistic Regression) returns probability
+4. `best_model.joblib` pipeline (preprocessor + Logistic Regression) returns probability; default decision threshold loaded from `evaluation_results.json` (user-overridable in the app)
 5. SHAP `LinearExplainer` explains individual predictions
 
 ## Model pipeline design

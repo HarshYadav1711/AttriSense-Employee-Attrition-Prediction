@@ -207,7 +207,7 @@ def _build_importance_matrix(
     if nominal:
         encoded = encoder.fit_transform(df[nominal])
         encoded_names = list(encoder.get_feature_names_out(nominal))
-        encoded_df = pd.DataFrame(encoded, columns=encoded_names, index=df.index)
+        encoded_df = pd.DataFrame(encoded, columns=encoded_names)
         matrix = pd.concat([df[numeric].reset_index(drop=True), encoded_df], axis=1)
         all_names = numeric + encoded_names
     else:
@@ -308,23 +308,48 @@ def resolve_redundancy(
     return sorted(to_drop), decisions
 
 
+def _stratified_dataframe_split(
+    df: pd.DataFrame,
+    config: ProjectConfig,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Hold-out split on full rows; matches modeling train/test indices."""
+    from sklearn.model_selection import train_test_split
+
+    y = (df[config.target_column] == config.positive_class).astype(int)
+    return train_test_split(
+        df,
+        test_size=config.modeling.test_size,
+        random_state=config.random_state,
+        stratify=y,
+    )
+
+
 def run_feature_engineering_pipeline(
     df: pd.DataFrame,
     config: ProjectConfig | None = None,
     save_artifacts: bool = True,
 ) -> tuple[pd.DataFrame, FeatureEngineeringReport]:
-    """Engineer features, evaluate importance, resolve redundancy, and save."""
+    """Engineer features, evaluate importance, resolve redundancy, and save.
+
+    Learned statistics (role income medians, feature importance, redundancy
+    decisions) are fit on the training split only; transforms are applied to
+    both training and hold-out rows before persisting the featured dataset.
+    """
     cfg = config or load_config()
     base_features = cfg.model_feature_columns
 
-    state = fit_feature_engineering_state(df, cfg)
-    featured = apply_engineered_features(df, state, cfg)
+    train_df, test_df = _stratified_dataframe_split(df, cfg)
+
+    state = fit_feature_engineering_state(train_df, cfg)
+    featured_train = apply_engineered_features(train_df, state, cfg)
+    featured_test = apply_engineered_features(test_df, state, cfg)
+    featured = pd.concat([featured_train, featured_test]).sort_index()
     engineered_cols = state.engineered_columns
     all_model_features = base_features + engineered_cols
 
-    importance = evaluate_feature_importance(featured, all_model_features, cfg)
+    importance = evaluate_feature_importance(featured_train, all_model_features, cfg)
     pairs = find_redundant_pairs(
-        featured,
+        featured_train,
         all_model_features,
         threshold=cfg.feature_engineering.correlation_threshold,
     )

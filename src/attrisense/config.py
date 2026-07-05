@@ -52,6 +52,7 @@ class ModelingConfig:
     cv_folds: int
     scoring: str
     n_jobs: int
+    threshold_optimization: str
 
 
 @dataclass(frozen=True)
@@ -129,6 +130,7 @@ class ProjectConfig:
                 cv_folds=int(mod.get("cv_folds", 5)),
                 scoring=str(mod.get("scoring", "roc_auc")),
                 n_jobs=int(mod.get("n_jobs", -1)),
+                threshold_optimization=str(mod.get("threshold_optimization", "f1")),
             ),
         )
 

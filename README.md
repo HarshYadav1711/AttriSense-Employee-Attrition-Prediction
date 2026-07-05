@@ -8,7 +8,7 @@ Built on the [IBM HR Analytics Attrition dataset](https://www.kaggle.com/dataset
 
 - **Explores** workforce data with filters, summaries, and EDA charts
 - **Trains** four classifiers (Logistic Regression, Decision Tree, Random Forest, XGBoost) with stratified cross-validation
-- **Evaluates** models on hold-out metrics, confusion matrices, ROC curves, and feature importance
+- **Evaluates** models on hold-out metrics, confusion matrices, ROC/PR curves, calibration, and feature importance
 - **Predicts** attrition probability for individual employees or CSV batches, with SHAP explanations
 - **Deploys** as a multi-page Streamlit app suitable for internal HR analytics
 

@@ -299,14 +299,25 @@ def prepare_feature_matrix(
     return featured[features].copy()
 
 
+def load_optimal_threshold(models_dir: Path | None = None) -> float:
+    """Load the decision threshold saved during evaluation."""
+    path = (models_dir or MODELS_DIR) / "evaluation_results.json"
+    if not path.exists():
+        return DEFAULT_DECISION_THRESHOLD
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    return float(payload.get("optimal_threshold", DEFAULT_DECISION_THRESHOLD))
+
+
 def predict_attrition(
     df: pd.DataFrame,
     employee_id_col: str | None = "EmployeeNumber",
     config: ProjectConfig | None = None,
     models_dir: Path | None = None,
-    threshold: float = DEFAULT_DECISION_THRESHOLD,
+    threshold: float | None = None,
 ) -> PredictionResult:
     """Run attrition prediction on one or more employee records."""
+    if threshold is None:
+        threshold = load_optimal_threshold(models_dir)
     pipeline = load_best_model(models_dir)
     feature_frame = prepare_feature_matrix(df, config, models_dir)
 

@@ -44,6 +44,14 @@ def get_evaluation_results() -> dict | None:
 
 
 @st.cache_data(show_spinner=False)
+def get_optimal_threshold() -> float:
+    results = get_evaluation_results()
+    if not results:
+        return 0.5
+    return float(results.get("optimal_threshold", 0.5))
+
+
+@st.cache_data(show_spinner=False)
 def get_categorical_options() -> dict[str, list]:
     df = get_raw_data()
     cfg = get_config()
